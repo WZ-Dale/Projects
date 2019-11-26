@@ -1,0 +1,7 @@
+﻿  main.cpp
+e:\projects\20191127\20191127\main.cpp(17): warning C4244: “参数”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=int
+          ]
+  20191127.vcxproj -> E:\Projects\20191127\x64\Debug\20191127.exe
