@@ -6,20 +6,24 @@
 using namespace std;
 using namespace cv;
 
-int main() {
+void Test1(){
 	Mat image11;
 	image11 = imread("image//11.jpg", IMREAD_GRAYSCALE);
 	//namedWindow("image11");
 	//imshow("image11", image11);
-	
+
 	// Í¼ÏñËõ·Å
 	Mat image11_1;
 	resize(image11, image11_1, Size(image11.cols / 5, image11.rows / 5), 0, 0, INTER_LINEAR);
 	imshow("image11_1", image11_1);
 
+	Rect rect(0, 250, 604, 300);
+	Mat ROI = image11_1(rect);
+	imshow("ROI", ROI);
+
 	// Ö±·½Í¼¾ùºâ»¯
 	Mat image11_2;
-	equalizeHist(image11_1, image11_2);
+	equalizeHist(ROI, image11_2);
 	imshow("image11_2", image11_2);
 
 	// ±ßÔµ¼ì²â
@@ -42,6 +46,25 @@ int main() {
 	imshow("image11_4", image11_4);
 
 	// ÇøÓòÌî³ä
+
+}
+
+void Test2() {
+	Mat image11;
+	image11 = imread("image//11.jpg", IMREAD_GRAYSCALE);
+
+	// Í¼ÏñËõ·Å
+	Mat image11_1;
+	resize(image11, image11_1, Size(image11.cols / 5, image11.rows / 5), 0, 0, INTER_LINEAR);
+
+	Rect rect(0, 250, 604, 300);
+	Mat ROI = image11_1(rect);
+	imshow("ROI", ROI);
+}
+
+int main() {
+	Test1();
+	//Test2();
 
 
 
