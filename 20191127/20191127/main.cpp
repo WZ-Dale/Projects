@@ -3,8 +3,11 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "loadDisplaySave.h"
+
 using namespace std;
 using namespace cv;
+
 
 void Test1(){
 	Mat image11;
@@ -63,12 +66,14 @@ void Test2() {
 }
 
 int main() {
-	Test1();
+	loadDisplaySave_Test();
+	//Test1();
 	//Test2();
 
 
 
 	//destroyAllWindows();
 	waitKey(0);
+	system("pause");
 	return  0;
 }
