@@ -3,10 +3,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "E:\Projects\Opencv3_Demo\1_loadDisplaySave_mat_logo\loadDisplaySave.h"
-#include "E:\Projects\Opencv3_Demo\1_loadDisplaySave_mat_logo\mat.h"
-#include "E:\Projects\Opencv3_Demo\1_loadDisplaySave_mat_logo\logo.h"
-
 
 using namespace std;
 using namespace cv;
@@ -69,11 +65,8 @@ void Test2() {
 }
 
 int main() {
-	//loadDisplaySave_Test();
-	//mat_Test();
-	logo_Test();
 	//Test1();
-	//Test2();
+	Test2();
 
 
 
