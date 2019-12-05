@@ -74,13 +74,14 @@ void salt2(cv::Mat image, int n) {
 }
 
 
-int salt_Test() {
+int saltImage_Test() {
 	// open the image
 	cv::Mat image= cv::imread("E:\\Projects\\Opencv3_Demo\\images\\boldt.jpg",1);
 
 	// call function to add noise
 	salt(image,3000);
 
+	// 这里加椒盐噪声，是直接加在原图image上的，虽然不是传引用，但在复制图像时仍然共享同一块图像数据，是浅拷贝
 	// display result
 	cv::namedWindow("Image");
 	cv::imshow("Image",image);
