@@ -8,6 +8,7 @@
 //#include "E:\Projects\Opencv3_Demo\1_loadDisplaySave_mat_logo\logo.h"
 
 #include "E:\Projects\Opencv3_Demo\2_saltImage_colorReduce_contrast_addImages_remapping\saltImage.h"
+#include "E:\Projects\Opencv3_Demo\2_saltImage_colorReduce_contrast_addImages_remapping\colorReduce.h"
 
 
 using namespace std;
@@ -17,8 +18,9 @@ int main() {
 	//loadDisplaySave_Test();
 	//mat_Test();
 	//logo_Test();
-	salt_Test();
 
+	//saltImage_Test();
+	colorReduce_Test();
 
 
 	//destroyAllWindows();
