@@ -1,5 +1,9 @@
 // 20191205
 // 学习并注释 by wangze
+
+// 在编写图像处理函数时，需要充分考虑运行效率问题。但事实上，除非确实必要，不要以牺牲代码的清晰度来优化性能。
+// 简洁的代码总是更容易调试和维护，只有对程序效率至关重要的代码段，才需要进行重度优化。 
+
 #pragma once
 
 #include <iostream>
@@ -7,6 +11,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+
+// 就地处理
 // 1st version
 // see recipe Scanning an image with pointers
 void colorReduce(cv::Mat image, int div=64) {
@@ -33,6 +39,7 @@ void colorReduce(cv::Mat image, int div=64) {
       }
 }
 
+// 使用输入和输出参数，亦可就地处理
 // version with input/ouput images
 // see recipe Scanning an image with pointers
 void colorReduceIO(const cv::Mat &image, // input image
@@ -43,11 +50,13 @@ void colorReduceIO(const cv::Mat &image, // input image
 	int nc = image.cols; // number of columns
 	int nchannels = image.channels(); // number of channels
 
+	// 如果需要的话，重新分配矩阵
 	// allocate output image if necessary
 	result.create(image.rows, image.cols, image.type());
 
 	for (int j = 0; j<nl; j++) {
 
+		// 获得第j行的输入和输出的地址
 		// get the addresses of input and output row j
 		const uchar* data_in = image.ptr<uchar>(j);
 		uchar* data_out = result.ptr<uchar>(j);
@@ -64,6 +73,7 @@ void colorReduceIO(const cv::Mat &image, // input image
 	}
 }
 
+// 解引用*
 // Test 1
 // this version uses the dereference operator *
 void colorReduce1(cv::Mat image, int div=64) {
@@ -89,6 +99,7 @@ void colorReduce1(cv::Mat image, int div=64) {
       }
 }
 
+// 取模
 // Test 2
 // this version uses the modulo operator
 void colorReduce2(cv::Mat image, int div=64) {
@@ -114,6 +125,7 @@ void colorReduce2(cv::Mat image, int div=64) {
       }
 }
 
+// 掩码
 // Test 3
 // this version uses a binary mask
 void colorReduce3(cv::Mat image, int div=64) {
@@ -121,6 +133,8 @@ void colorReduce3(cv::Mat image, int div=64) {
       int nl= image.rows; // number of lines
       int nc= image.cols * image.channels(); // total number of elements per line
       int n= static_cast<int>(log(static_cast<double>(div))/log(2.0) + 0.5);
+
+	  // 用来截取像素的值的掩码
       // mask used to round the pixel value
       uchar mask= 0xFF<<n; // e.g. for div=16, mask= 0xF0
       uchar div2= 1<<(n-1); // div2 = div/2
@@ -142,7 +156,7 @@ void colorReduce3(cv::Mat image, int div=64) {
       }
 }
 
-
+// 带有二进制掩码的直接指针算法
 // Test 4
 // this version uses direct pointer arithmetic with a binary mask
 void colorReduce4(cv::Mat image, int div=64) {
@@ -150,11 +164,16 @@ void colorReduce4(cv::Mat image, int div=64) {
       int nl= image.rows; // number of lines
       int nc= image.cols * image.channels(); // total number of elements per line
       int n= static_cast<int>(log(static_cast<double>(div))/log(2.0) + 0.5);
+
+	  // step属性可以得到一行的总字节数（包括填充像素）
       int step= image.step; // effective width
+
+	  // 用来截取像素的值的掩码
       // mask used to round the pixel value
       uchar mask= 0xFF<<n; // e.g. for div=16, mask= 0xF0
 	  uchar div2 = div >> 1; // div2 = div/2
 
+	  // data属性表示内存块第一个元素的地址，返回一个无符号字符型的指针
       // get the pointer to the image buffer
       uchar *data= image.data;
 
@@ -175,6 +194,7 @@ void colorReduce4(cv::Mat image, int div=64) {
       }
 }
 
+// 每次重新计算行大小
 // Test 5
 // this version recomputes row size each time
 void colorReduce5(cv::Mat image, int div=64) {
@@ -201,6 +221,7 @@ void colorReduce5(cv::Mat image, int div=64) {
       }
 }
 
+// 优化连续图像的情况，一维数组
 // Test 6
 // this version optimizes the case of continuous image
 void colorReduce6(cv::Mat image, int div=64) {
@@ -238,11 +259,13 @@ void colorReduce6(cv::Mat image, int div=64) {
       }
 }
 
+// reshape方法
 // Test 7
 // this versions applies reshape on continuous image
 void colorReduce7(cv::Mat image, int div=64) {
 
       if (image.isContinuous()) {
+		// 修改矩阵维数
         // no padded pixels
         image.reshape(1,   // new number of channels
                       1) ; // new number of rows
@@ -274,6 +297,7 @@ void colorReduce7(cv::Mat image, int div=64) {
       }
 }
 
+// 迭代器的使用，对以上方法进行改写。但迭代器运行速度较慢，主要是问了简化扫描过程，降低出错的可能。
 // Test 8
 // this version processes the 3 channels inside the loop with Mat_ iterators
 void colorReduce8(cv::Mat image, int div=64) {
@@ -366,7 +390,7 @@ void colorReduce11(cv::Mat image, int div=64) {
       }
 }
 
-
+// 实现用at方法访问像素的函数，该方法运行速度较慢。只有在需要随机访问像素的时候使用，不要在扫描图像时使用。
 // Test 12
 // this version uses the at method
 void colorReduce12(cv::Mat image, int div=64) {
@@ -430,7 +454,8 @@ int colorReduce_Test (){
 	colorReduce(image, 64);
 	//Elapsed time in seconds
 	double duration = (cv::getTickCount() - start) / cv::getTickFrequency();
-
+	// 其中：getTickCount()返回计算机开机到当前的时钟周期数，getTickFrequency()返回每秒的时钟周期数
+	
 	// display the image
 	std::cout << "Duration= " << duration << "secs" << std::endl;
 	cv::namedWindow("Image");
@@ -438,8 +463,8 @@ int colorReduce_Test (){
 
 	cv::waitKey();
 
-	// test different versions of the function
 
+	// test different versions of the function
 	int64 t[NTESTS], tinit;
 	// timer values set to 0
 	for (int i = 0; i<NTESTS; i++)
@@ -453,12 +478,14 @@ int colorReduce_Test (){
 	FunctionPointer functions[NTESTS] = { colorReduce, colorReduce1, colorReduce2, colorReduce3, colorReduce4,
 										  colorReduce5, colorReduce6, colorReduce7, colorReduce8, colorReduce9,
 										  colorReduce10, colorReduce11, colorReduce12, colorReduce13, colorReduce14};
+	// 重复测试几次，为了求平均值
 	// repeat the tests several times
 	int n = NITERATIONS;
 	for (int k = 0; k<n; k++) {
 
 		std::cout << k << " of " << n << std::endl;
 
+		// 测试每一种函数的执行时间
 		// test each version
 		for (int c = 0; c < NTESTS; c++) {
 
@@ -500,10 +527,11 @@ int colorReduce_Test (){
 		cv::imshow(descriptions[i], images[i]);
 	}
 
+	// 打印平均执行时间
 	// print average execution time
 	std::cout << std::endl << "-------------------------------------------" << std::endl << std::endl;
 	for (int i = 0; i < NTESTS; i++) {
-
+		std::cout << i << ". " << descriptions[i] << t[i] / cv::getTickFrequency() / n << "s" << std::endl;
 		std::cout << i << ". " << descriptions[i] << 1000.*t[i] / cv::getTickFrequency() / n << "ms" << std::endl;
 	}
 
