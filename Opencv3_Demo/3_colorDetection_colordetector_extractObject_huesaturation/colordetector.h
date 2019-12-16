@@ -35,7 +35,8 @@ class ColorDetector {
 
 	  // extra constructor for Lab color space example
 	  ColorDetector(bool useLab) : maxDist(100), target(0,0,0), useLab(useLab) {}
-
+	  
+	  // 另一种构造函数，使用用户输入的目标颜色和颜色距离作为参数
 	  // full constructor
 	  ColorDetector(uchar blue, uchar green, uchar red, int mxDist=100, bool useLab=false): maxDist(mxDist), useLab(useLab) { 
 
@@ -65,9 +66,11 @@ class ColorDetector {
 		  // return cv::sum(dist)[0];
 	  }
 
+	  // 函数声明
 	  // Processes the image. Returns a 1-channel binary image.
 	  cv::Mat process(const cv::Mat &image);
 
+	  // 重载operator()目的->仿函数
 	  cv::Mat operator()(const cv::Mat &image) {
 	  
 		  cv::Mat input;
@@ -98,9 +101,9 @@ class ColorDetector {
 	  }
 
 
-	  // Getters and setters
 	  // 设置颜色差距的阈值
 	  // 阈值必须是正数，否则就设置为0
+	  // Getters and setters
 	  // Sets the color distance threshold.
 	  // Threshold must be positive, otherwise distance threshold
 	  // is set to 0.
@@ -117,12 +120,12 @@ class ColorDetector {
 		  return maxDist;
 	  }
 
-
 	  // 设置需要检测的颜色
 	  // Sets the color to be detected
 	  // given in BGR color space
 	  void setTargetColor(uchar blue, uchar green, uchar red) {
 
+		  // 次序为BGR
 		  // BGR order
 		  target = cv::Vec3b(blue, green, red);
 

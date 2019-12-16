@@ -36,14 +36,15 @@ int colorDetection_Test() {
 	result = colordetector(image);
 	cv::imshow("result (functor)",result);
 
+	// 使用floodFill函数，实现相同功能
 	// testing floodfill
-	cv::floodFill(image,            // input/ouput image
-		cv::Point(100, 50),         // seed point
-		cv::Scalar(255, 255, 255),  // repainted color
-		(cv::Rect*)0,  // bounding rectangle of the repainted pixel set
-		cv::Scalar(35, 35, 35),     // low and high difference threshold
-		cv::Scalar(35, 35, 35),     // most of the time will be identical
-		cv::FLOODFILL_FIXED_RANGE); // pixels are compared to seed color
+	cv::floodFill(image,            // input/ouput image						// 输入/输出图像
+		cv::Point(100, 50),         // seed point								// 起始点
+		cv::Scalar(255, 255, 255),  // repainted color							// 填充颜色
+		(cv::Rect*)0,  // bounding rectangle of the repainted pixel set			// 填充区域的边界矩形
+		cv::Scalar(35, 35, 35),     // low and high difference threshold		// 偏差的最小/最大阈值
+		cv::Scalar(35, 35, 35),     // most of the time will be identical		// 正差阈值，两个阈值通常相等
+		cv::FLOODFILL_FIXED_RANGE); // pixels are compared to seed color		// 与起始点像素比较
 
 	cv::namedWindow("Flood Fill result");
 	result = colordetector(image);

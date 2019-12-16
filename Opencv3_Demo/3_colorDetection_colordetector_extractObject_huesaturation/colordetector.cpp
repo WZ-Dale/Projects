@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "colordetector.h"
+#include "E:\Projects\Opencv3_Demo\3_colorDetection_colordetector_extractObject_huesaturation\colordetector.h"
 #include <vector>
 	
 cv::Mat ColorDetector::process(const cv::Mat &image) {
@@ -13,7 +13,7 @@ cv::Mat ColorDetector::process(const cv::Mat &image) {
 	  // same size as input image, but 1-channel
 	  result.create(image.size(),CV_8U);
 
-	  // 转换到实验室颜色空间
+	  // 转换到Lab颜色空间
 	  // Converting to Lab color space 
 	  if (useLab)
 		  cv::cvtColor(image, converted, CV_BGR2Lab);
