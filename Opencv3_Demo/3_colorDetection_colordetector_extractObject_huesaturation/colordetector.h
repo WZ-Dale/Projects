@@ -9,6 +9,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <opencv2/imgproc/types_c.h>
+
 class ColorDetector {
 
   private:
@@ -66,15 +68,56 @@ class ColorDetector {
 		  // return cv::sum(dist)[0];
 	  }
 
-	  // 函数声明
 	  // Processes the image. Returns a 1-channel binary image.
-	  cv::Mat process(const cv::Mat &image);
+	  cv::Mat process(const cv::Mat &image) {
+			  // 必要时重新分配二值映像
+			  // 与输入图像的尺寸相同，不过是单通道
+			  // re-allocate binary map if necessary
+			  // same size as input image, but 1-channel
+			  result.create(image.size(), CV_8U);
+
+			  // 转换到Lab颜色空间
+			  // Converting to Lab color space 
+			  if (useLab)
+				  cv::cvtColor(image, converted, CV_BGR2Lab);
+
+			  // 取得迭代器
+			  // get the iterators
+			  cv::Mat_<cv::Vec3b>::const_iterator it = image.begin<cv::Vec3b>();
+			  cv::Mat_<cv::Vec3b>::const_iterator itend = image.end<cv::Vec3b>();
+			  cv::Mat_<uchar>::iterator itout = result.begin<uchar>();
+
+			  // 获取转换后图像的迭代器
+			  // get the iterators of the converted image 
+			  if (useLab) {
+				  it = converted.begin<cv::Vec3b>();
+				  itend = converted.end<cv::Vec3b>();
+			  }
+
+			  // 对比每个像素
+			  // for each pixel
+			  for (; it != itend; ++it, ++itout) {
+				  // process each pixel --------------------- 处理每一个像素
+					  // 比较与目标颜色的差距
+					  // compute distance from target color
+				  if (getDistanceToTargetColor(*it) < maxDist) {
+					  *itout = 255;
+				  }
+				  else {
+					  *itout = 0;
+				  }
+				  // end of pixel processing ---------------- 像素处理结束
+			  }
+
+			  return result;
+	  }
 
 	  // 重载operator()目的->仿函数
 	  cv::Mat operator()(const cv::Mat &image) {
 	  
 		  cv::Mat input;
-		 
+		  
+		  // 转换到Lab颜色空间
 		  if (useLab) { // Lab conversion
 			  cv::cvtColor(image, input, CV_BGR2Lab);
 		  }
@@ -130,10 +173,12 @@ class ColorDetector {
 		  target = cv::Vec3b(blue, green, red);
 
 		  if (useLab) {
+			  // 临时的单像素图像
 			  // Temporary 1-pixel image
 			  cv::Mat tmp(1, 1, CV_8UC3);
 			  tmp.at<cv::Vec3b>(0, 0) = cv::Vec3b(blue, green, red);
 
+			  // 将目标颜色转换到Lab颜色空间
 			  // Converting the target to Lab color space 
 			  cv::cvtColor(tmp, tmp, CV_BGR2Lab);
 
@@ -153,6 +198,5 @@ class ColorDetector {
 		  return target;
 	  }
 };
-
 
 #endif

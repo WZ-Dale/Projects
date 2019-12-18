@@ -8,6 +8,7 @@
 
 #include "E:\Projects\Opencv3_Demo\3_colorDetection_colordetector_extractObject_huesaturation\colordetector.h"
 
+
 int colorDetection_Test() {
     // 1. Create image processor object						// 创建图像处理器
 	ColorDetector cdetect;
@@ -27,7 +28,7 @@ int colorDetection_Test() {
 	cv::Mat result = cdetect.process(image);
 	cv::imshow("result",result);
 
-
+	// 使用仿函数来实现同样功能
 	// or using functor
 	// here distance is measured with the Lab color space
 	ColorDetector colordetector(230, 190, 130,  // color
@@ -50,6 +51,7 @@ int colorDetection_Test() {
 	result = colordetector(image);
 	cv::imshow("Flood Fill result", image);
 
+	// 创建人工图像来演示颜色空间属性
 	// Creating artificial images to demonstrate color space properties
 	cv::Mat colors(100, 300, CV_8UC3, cv::Scalar(100, 200, 150));
 	cv::Mat range= colors.colRange(0, 100);
