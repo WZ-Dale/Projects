@@ -1,6 +1,7 @@
 // 20191216
 // 学习并注释 by wangze
 
+#pragma once
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -9,21 +10,26 @@
 #include <iostream>
 #include <vector>
 
+#include <opencv2/imgproc/types_c.h>
+
+// 一个基于数值区间（最小和最大色调、最小和最大饱和度）的函数
 void detectHScolor(const cv::Mat& image,		// input image 
 	double minHue, double maxHue,	// Hue interval 
 	double minSat, double maxSat,	// saturation interval
 	cv::Mat& mask) {				// output mask
 
+	// 转换到HSV色彩空间
 	// convert into HSV space
 	cv::Mat hsv;
 	cv::cvtColor(image, hsv, CV_BGR2HSV);
 
+	// 将3个通道分割进三幅图像中
 	// split the 3 channels into 3 images
 	std::vector<cv::Mat> channels;
 	cv::split(hsv, channels);
-	// channels[0] is the Hue
-	// channels[1] is the Saturation
-	// channels[2] is the Value
+	// channels[0] is the Hue				色调（主色，不同的颜色对应不同的色调值）
+	// channels[1] is the Saturation		饱和度（颜色的鲜艳程度，柔和的颜色饱和度低）
+	// channels[2] is the Value				亮度（主观属性，某种颜色的亮度程度）
 
 	// Hue masking
 	cv::Mat mask1; // below maxHue
@@ -68,9 +74,9 @@ int huesaturation_Test () {
 	// split the 3 channels into 3 images
 	std::vector<cv::Mat> channels;
 	cv::split(hsv,channels);
-	// channels[0] is the Hue
-	// channels[1] is the Saturation
-	// channels[2] is the Value
+	// channels[0] is the Hue				色调（主色，不同的颜色对应不同的色调值）
+	// channels[1] is the Saturation		饱和度（颜色的鲜艳程度，柔和的颜色饱和度低）
+	// channels[2] is the Value				亮度（主观属性，某种颜色的亮度程度）
 
 	// display value
 	cv::namedWindow("Value");
@@ -85,12 +91,15 @@ int huesaturation_Test () {
 	cv::imshow("Hue",channels[0]);
 
 	// image with fixed value
-	cv::Mat newImage;
+	cv::Mat newImage;		
 	cv::Mat tmp(channels[2].clone());
+	// 所有像素的颜色亮度通道将变为255
 	// Value channel will be 255 for all pixels
-	channels[2]= 255;  
+	channels[2]= 255;
+	// 重新合并通道
 	// merge back the channels
 	cv::merge(channels,hsv);
+	// 转换回BGR
 	// re-convert to BGR
 	cv::cvtColor(hsv,newImage,CV_HSV2BGR);
 
@@ -115,13 +124,14 @@ int huesaturation_Test () {
 	cv::namedWindow("Fixed saturation/value");
 	cv::imshow("Fixed saturation/value",newImage);
 
+	// 人工图像显示所有可能的HS颜色
 	// artificial image shown the all possible HS colors
 	cv::Mat hs(128, 360, CV_8UC3);  
 	for (int h = 0; h < 360; h++) {
 		for (int s = 0; s < 128; s++) {
-			hs.at<cv::Vec3b>(s, h)[0] = h/2;     // all hue angles
-			hs.at<cv::Vec3b>(s, h)[1] = 255-s*2; // from high saturation to low
-			hs.at<cv::Vec3b>(s, h)[2] = 255;     // constant value
+			hs.at<cv::Vec3b>(s, h)[0] = h/2;     // all hue angles					所有色调角度
+			hs.at<cv::Vec3b>(s, h)[1] = 255-s*2; // from high saturation to low		饱和度从高到低
+			hs.at<cv::Vec3b>(s, h)[2] = 255;     // constant value					常数
 		}
 	}
 
@@ -130,10 +140,12 @@ int huesaturation_Test () {
 	cv::namedWindow("Hue/Saturation");
 	cv::imshow("Hue/Saturation", newImage);
 
+
+	// 测试皮肤检测
 	// Testing skin detection
 
 	// read the image
-	image= cv::imread("girl.jpg");
+	image= cv::imread("E:\\Projects\\Opencv3_Demo\\images\\girl.jpg");
 	if (!image.data)
 		return 0; 
 
