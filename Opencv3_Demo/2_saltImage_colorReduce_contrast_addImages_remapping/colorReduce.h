@@ -431,13 +431,13 @@ void colorReduce13(cv::Mat image, int div=64) {
 // this version uses a look up table
 void colorReduce14(cv::Mat image, int div=64) {
 
-      cv::Mat lookup(1,256,CV_8U);
-
+      cv::Mat lookup(1,256,CV_8U);// 创建一维查找表
+		//定义减色查找表的值
       for (int i=0; i<256; i++) {
 
         lookup.at<uchar>(i)= i/div*div + div/2;
       }
-
+		// 对每个通道应用查找表
       cv::LUT(image,lookup,image);
 }
 
