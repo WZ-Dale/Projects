@@ -20,7 +20,7 @@ class IntegralImage {
   public:
 
 	  IntegralImage(cv::Mat image) {
-
+		  // ¼ÆËã»ı·ÖÍ¼Ïñ
 		// (costly) computation of the integral image
 		cv::integral(image,integralImage,cv::DataType<T>::type);
 	  }
