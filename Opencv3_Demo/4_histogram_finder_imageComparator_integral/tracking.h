@@ -13,7 +13,7 @@
 
 #include "E:\Projects\Opencv3_Demo\4_histogram_finder_imageComparator_integral\histogram.h"
 #include "E:\Projects\Opencv3_Demo\4_histogram_finder_imageComparator_integral\integral.h"
-
+// 直方图实现视觉跟踪
 int tracking_Test() {
 
 	// Open image
