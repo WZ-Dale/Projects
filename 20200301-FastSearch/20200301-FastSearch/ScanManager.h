@@ -4,5 +4,9 @@
 
 class ScanManager 
 {
-	
+public:
+	void Scan(const string& path);
+
+private:
+
 };
