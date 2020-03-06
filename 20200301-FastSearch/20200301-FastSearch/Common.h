@@ -14,6 +14,9 @@ using std::string;
 using std::vector;
 using std::set;
 
+#define __DEBUG__
+#define __TRACE__
+
 // 目录列举
 static void DirectoryList(const string& path, vector<string>& dirs, vector<string>& files) {
 	_finddata_t file;	//	文件信息结构体

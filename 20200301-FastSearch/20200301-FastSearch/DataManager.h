@@ -21,6 +21,6 @@ public:
 	SqliteManager(const SqliteManager&) = delete;
 	SqliteManager& operator=(const SqliteManager&) = delete;
 private:
-	sqlite3* _db; // 数据库对象
+	sqlite3* _db;	// 数据库对象
 };
 

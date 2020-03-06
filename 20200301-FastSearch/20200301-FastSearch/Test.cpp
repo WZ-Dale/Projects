@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "DataManager.h"
 
 void TestDirectoryList() {
 	vector<string> dirs, files;
@@ -11,7 +12,33 @@ void TestDirectoryList() {
 	}
 }
 
+void TestSqlite() {
+	// 打开数据库
+	SqliteManager sq;
+	sq.Open("E:\\Projects\\20200301-FastSearch\\20200301-FastSearch\\test.db");
+
+	// 创建表
+	//string exists_sql = "select count(*)  from sqlite_master where type='table' and name = 'tb_doc'"
+	string createtb_sql = "create table tb_doc(id integer primary key autoincrement, doc_path text, doc_name int)";
+	sq.ExecuteSql(createtb_sql);
+	
+	// 插入数据
+	string insert_sql = "insert into tb_doc values(NULL, '路径', 'name')";
+	sq.ExecuteSql(insert_sql);
+	insert_sql = "insert into tb_doc values(NULL, '22', 'qq')";
+	sq.ExecuteSql(insert_sql);
+	insert_sql = "insert into tb_doc values(NULL, '33', 'ww')";
+	sq.ExecuteSql(insert_sql);
+	insert_sql = "insert into tb_doc values(NULL, '44', 'ee')";
+	sq.ExecuteSql(insert_sql);
+
+	// 查找数据
+	string query_sql = "select * from tb_doc where doc_path = '33'";
+	sq.ExecuteSql(query_sql);
+}
+
 int main() {
-	TestDirectoryList();
+	//TestDirectoryList();
+	TestSqlite();
 	return 0;
 }
