@@ -34,7 +34,15 @@ void TestSqlite() {
 
 	// 查找数据
 	string query_sql = "select * from tb_doc where doc_path = '33'";
-	sq.ExecuteSql(query_sql);
+	int row, col;
+	char** ppRet;
+	sq.GetTable(query_sql, row, col, ppRet);
+	for (int i = 0; i < row; ++i) {
+		for (int j = 0; j < col; ++j) {
+			cout << ppRet[i * col + j] << "\t";		// 由于该数据库表在内存中按一维数组存放的
+		}
+		cout << endl;
+	}
 }
 
 int main() {

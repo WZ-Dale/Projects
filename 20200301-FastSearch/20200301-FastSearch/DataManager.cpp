@@ -26,10 +26,17 @@ void SqliteManager::ExecuteSql(const string& sql) {
 		TRACE_LOG("sqlite3_exec(%s) success\n", sql.c_str());
 	}
 	else {						// 如果执行数据库语句 失败
-		ERROE_LOG("sqlite3_exec(%s)\n", sql.c_str());
+		ERROE_LOG("sqlite3_exec(%s) errmsg:%s\n", sql.c_str(), errmsg);
 	}
 }
 void SqliteManager::GetTable(const string& sql, int& row, int& col, char**& ppRet) {
-
+	char* errmsg;
+	int ret = sqlite3_get_table(_db, sql.c_str(), &ppRet, &row, &col, &errmsg);
+	if (ret == SQLITE_OK) {		// 如果执行数据库语句 成功
+		TRACE_LOG("sqlite3_get_table(%s) success\n", sql.c_str());
+	}
+	else {						// 如果执行数据库语句 失败
+		ERROE_LOG("sqlite3_get_table(%s) errmsg:%s\n", sql.c_str(), errmsg);
+	}
 }
 
