@@ -36,8 +36,19 @@ void TestSqlite() {
 	string query_sql = "select * from tb_doc where doc_path = '33'";
 	int row, col;
 	char** ppRet;
+	/*
 	sq.GetTable(query_sql, row, col, ppRet);
-	for (int i = 0; i < row; ++i) {
+	for (int i = 1; i < row; ++i) {			// 第一行是字段名称，不取
+		for (int j = 0; j < col; ++j) {
+			cout << ppRet[i * col + j] << "\t";		// 由于该数据库表在内存中按一维数组存放的
+		}
+		cout << endl;
+	}
+	sqlite3_free_table(ppRet);
+	*/
+	// 使用智能指针进行动态内存释放
+	AutoGetTable agt(sq, query_sql, row, col, ppRet);
+	for (int i = 1; i < row; ++i) {			// 第一行是字段名称，不取
 		for (int j = 0; j < col; ++j) {
 			cout << ppRet[i * col + j] << "\t";		// 由于该数据库表在内存中按一维数组存放的
 		}

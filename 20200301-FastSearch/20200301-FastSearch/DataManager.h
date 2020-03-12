@@ -23,4 +23,19 @@ public:
 private:
 	sqlite3* _db;	// 数据库对象
 };
-
+// RAII
+class AutoGetTable
+{
+public:
+	AutoGetTable(SqliteManager& sm, const string& sql, int& row, int& col, char**& ppRet) {
+		sm.GetTable(sql, row, col, ppRet);
+		_ppRet = ppRet;
+	}
+	~AutoGetTable() {
+		sqlite3_free_table(_ppRet);
+	}
+	AutoGetTable(const AutoGetTable&) = delete;
+	AutoGetTable& operator=(const AutoGetTable&) = delete;
+private:
+	char** _ppRet;
+};
