@@ -39,3 +39,19 @@ public:
 private:
 	char** _ppRet;
 };
+
+//////////////////////////////////////////////////////////
+// 数据管理模块
+#define DB_NAME "doc.db"
+#define TB_NAME "tb_doc"
+
+class DataManager
+{
+public:
+	void Init();	// 建表，打开数据库
+	void GetDoc(const string& path, set<string>& dbset);	// 查找path下的所有子文档
+	void InsertDoc(const string& path, const string& name);
+	void DeleteDoc(const string& path, const string& name);
+private:
+	SqliteManager _dbmgr;
+};

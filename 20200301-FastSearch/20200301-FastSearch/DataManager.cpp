@@ -46,3 +46,38 @@ void SqliteManager::GetTable(const string& sql, int& row, int& col, char**& ppRe
 		sqlite3_free(errmsg);
 	}
 }
+////////////////////////////////////////////////////////
+void DataManager::Init() {
+	_dbmgr.Open(DB_NAME);
+	char createtb_sql[256];
+	sprintf(createtb_sql, "create table if not exists %s (id integer primary key, path text, name text, name_pinyin text, name_initials text)", TB_NAME);	// 完整地建表
+	_dbmgr.ExecuteSql(createtb_sql);
+}
+void DataManager::GetDoc(const string& path, set<string>& dbset) {
+	char query_sql[256];
+	sprintf(query_sql, "select name from %s where path = '%s'", TB_NAME, path.c_str());
+	int row, col;
+	char** ppRet;
+	AutoGetTable agt(_dbmgr, query_sql, row, col, ppRet);
+	for (int i = 1; i <= row; ++i) {
+		for (int j = 0; j < col; ++j) {
+			dbset.insert(ppRet[i * col + j]);
+		}
+	}
+}
+void DataManager::InsertDoc(const string& path, const string& name) {
+	char insert_sql[256];
+	sprintf(insert_sql, "insert into %s (path, name) values('%s', '%s')", TB_NAME, path.c_str(), name.c_str());
+	_dbmgr.ExecuteSql(insert_sql);
+}
+void DataManager::DeleteDoc(const string& path, const string& name) {
+	char delete_sql[256];
+	sprintf(delete_sql, "delete from %s where path = '%s' and name = '%s'", TB_NAME, path.c_str(), name.c_str());
+	_dbmgr.ExecuteSql(delete_sql);
+	// 注意：此处若文件系统中删除的目录含有下级文件，数据库中也需要将下级文件删除
+	string path_ = path;
+	path_ += '\\';
+	path_ += name;
+	sprintf(delete_sql, "delete from %s where path like '%s%%'", TB_NAME, path_.c_str());
+	_dbmgr.ExecuteSql(delete_sql);
+}

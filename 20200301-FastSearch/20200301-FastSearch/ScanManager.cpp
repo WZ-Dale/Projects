@@ -13,17 +13,17 @@ void ScanManager::Scan(const string& path) {
 	localset.insert(localfiles.begin(), localfiles.end());
 
 	set<string> dbset;
-	//DataManager();
+	_datamgr.GetDoc(path, dbset);
 
 	auto localit = localset.begin();
 	auto dbit = dbset.begin();
 	while (localit != localset.end() && dbit != dbset.end()) {
 		if (*localit < *dbit) {		// 本地有，数据库没有，数据库新增
-
+			_datamgr.InsertDoc(path, *localit);
 			++localit;
 		}
 		else if (*localit > *dbit) {		// 本地没有，数据库有，数据库删除
-
+			_datamgr.DeleteDoc(path, *dbit);
 			++dbit;
 		}
 		else {		// 本地和数据库一致，数据不变
@@ -32,16 +32,19 @@ void ScanManager::Scan(const string& path) {
 		}
 	}
 	while (localit != localset.end()) {
-		// 数据库新增
+		_datamgr.InsertDoc(path, *localit);	// 数据库新增
 		++localit;
 	}
 	while (dbit != dbset.end()) {
-		// 数据库删除
+		_datamgr.DeleteDoc(path, *dbit);	// 数据库删除
 		++dbit;
 	}
 	// 递归比对子目录数据
 	for (const auto& subdirs : localdirs) {
-		//Scan(subdirs);
+		string subpath = path;
+		subpath += '\\';
+		subpath += subdirs;
+		Scan(subpath);
 	}
 }
 
