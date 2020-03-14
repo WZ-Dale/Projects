@@ -81,3 +81,13 @@ void DataManager::DeleteDoc(const string& path, const string& name) {
 	sprintf(delete_sql, "delete from %s where path like '%s%%'", TB_NAME, path_.c_str());
 	_dbmgr.ExecuteSql(delete_sql);
 }
+void DataManager::Search(const string& key, vector<std::pair<string, string>>& docinfos) {
+	char search_sql[256];
+	sprintf(search_sql, "select name, path from %s where name like '%%%s%%'", TB_NAME, key.c_str());
+	int row, col;
+	char** ppRet;
+	AutoGetTable agt(_dbmgr, search_sql, row, col, ppRet);
+	for (int i = 1; i <= row; ++i) {
+		docinfos.push_back(std::make_pair(ppRet[i * col], ppRet[i * col + 1]));
+	}
+}

@@ -8,6 +8,7 @@
 #include <io.h>
 #include "sqlite-amalgamation-3280000/sqlite3.h"
 
+using std::cin;
 using std::cout;
 using std::endl;
 using std::string;

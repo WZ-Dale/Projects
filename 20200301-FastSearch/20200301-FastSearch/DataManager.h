@@ -52,6 +52,7 @@ public:
 	void GetDoc(const string& path, set<string>& dbset);	// 查找path下的所有子文档
 	void InsertDoc(const string& path, const string& name);
 	void DeleteDoc(const string& path, const string& name);
+	void Search(const string& key, vector<std::pair<string, string>>& docinfos);
 private:
 	SqliteManager _dbmgr;
 };

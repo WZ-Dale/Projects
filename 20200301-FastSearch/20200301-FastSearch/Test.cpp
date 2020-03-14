@@ -62,9 +62,24 @@ void TestScanManager() {
 	scanmgr.Scan("E:\\Projects\\20200301-FastSearch\\20200301-FastSearch\\Test");
 }
 
+void TestSearch() {
+	DataManager datamgr;
+	string key;
+	vector<std::pair<string, string>> docinfos;
+	cout << "============================================" << endl;
+	while (cin >> key) {
+		datamgr.Search(key, docinfos);
+		for (const auto& e : docinfos) {
+			cout << e.first << '\t' << e.second;
+		}
+		cout << "============================================" << endl;
+	}
+}
+
 int main() {
 	//TestDirectoryList();
 	//TestSqlite();
-	TestScanManager();
+	//TestScanManager();
+	TestSearch();
 	return 0;
 }

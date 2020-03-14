@@ -15,6 +15,7 @@ void ScanManager::Scan(const string& path) {
 	set<string> dbset;
 	_datamgr.GetDoc(path, dbset);
 
+	// 开始比对
 	auto localit = localset.begin();
 	auto dbit = dbset.begin();
 	while (localit != localset.end() && dbit != dbset.end()) {
