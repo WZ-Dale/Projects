@@ -64,22 +64,30 @@ void TestScanManager() {
 
 void TestSearch() {
 	DataManager datamgr;
+	datamgr.Init();
 	string key;
 	vector<std::pair<string, string>> docinfos;
-	cout << "============================================" << endl;
+	cout << "==========================================================" << endl;
 	while (cin >> key) {
+		docinfos.clear();
 		datamgr.Search(key, docinfos);
 		for (const auto& e : docinfos) {
-			cout << e.first << '\t' << e.second;
+			cout << e.first << '\t' << '\t' << '\t' << e.second << endl;
 		}
-		cout << "============================================" << endl;
+		cout << "==========================================================" << endl;
 	}
+}
+void TestPinyin() {
+	ColourPrintf("我是谁 who am i pinyin\n");
+	cout << ChineseConvertPinYinAllSpell("我是谁 who am i pinyin") << endl;
+	cout << ChineseConvertPinYinInitials("我是谁 who am i pinyin") << endl;
 }
 
 int main() {
 	//TestDirectoryList();
 	//TestSqlite();
-	//TestScanManager();
-	TestSearch();
+	TestScanManager();
+	//TestSearch();
+	//TestPinyin();
 	return 0;
 }

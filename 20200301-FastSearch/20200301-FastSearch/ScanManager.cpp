@@ -13,7 +13,7 @@ void ScanManager::Scan(const string& path) {
 	localset.insert(localfiles.begin(), localfiles.end());
 
 	set<string> dbset;
-	_datamgr.GetDoc(path, dbset);
+	_datamgr.GetDoc(path, dbset);		// 将数据库中的数据放到set中，为后序比对做准备
 
 	// 开始比对
 	auto localit = localset.begin();

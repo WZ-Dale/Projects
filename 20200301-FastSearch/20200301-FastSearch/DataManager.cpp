@@ -25,6 +25,7 @@ void SqliteManager::Close() {
 	}
 }
 void SqliteManager::ExecuteSql(const string& sql) {
+	assert(_db);
 	char* errmsg;		// 存储错误信息
 	int ret = sqlite3_exec(_db, sql.c_str(), nullptr, nullptr, &errmsg);
 	if (ret == SQLITE_OK) {		// 如果执行数据库语句 成功
@@ -36,6 +37,7 @@ void SqliteManager::ExecuteSql(const string& sql) {
 	}
 }
 void SqliteManager::GetTable(const string& sql, int& row, int& col, char**& ppRet) {
+	assert(_db);
 	char* errmsg;		// 存储错误信息
 	int ret = sqlite3_get_table(_db, sql.c_str(), &ppRet, &row, &col, &errmsg);
 	if (ret == SQLITE_OK) {		// 如果执行数据库语句 成功
@@ -67,7 +69,9 @@ void DataManager::GetDoc(const string& path, set<string>& dbset) {
 }
 void DataManager::InsertDoc(const string& path, const string& name) {
 	char insert_sql[256];
-	sprintf(insert_sql, "insert into %s (path, name) values('%s', '%s')", TB_NAME, path.c_str(), name.c_str());
+	string pinyin = ChineseConvertPinYinAllSpell(name);
+	string initials = ChineseConvertPinYinInitials(name);
+	sprintf(insert_sql, "insert into %s (path, name, name_pinyin, name_initials) values('%s', '%s', '%s', '%s')", TB_NAME, path.c_str(), name.c_str(), pinyin.c_str(), initials.c_str());
 	_dbmgr.ExecuteSql(insert_sql);
 }
 void DataManager::DeleteDoc(const string& path, const string& name) {

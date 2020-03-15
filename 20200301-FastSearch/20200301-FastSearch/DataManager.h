@@ -2,7 +2,8 @@
 
 #include "Common.h"
 
-// SqliteManager是对Sqlite的接口进行一层简单的封装。
+//////////////////////////////////////////////////////////
+// SqliteManager 是对 Sqlite的接口 进行一层简单的封装
 class SqliteManager
 {
 public:
@@ -13,12 +14,12 @@ public:
 	{
 		Close();
 	}
-	void Open(const string& path);
-	void Close();
-	void ExecuteSql(const string& sql);
-	void GetTable(const string& sql, int& row, int& col, char**& ppRet);
+	void Open(const string& path);		// 打开数据库
+	void Close();						// 关闭数据库
+	void ExecuteSql(const string& sql);		// 执行数据库语句
+	void GetTable(const string& sql, int& row, int& col, char**& ppRet);	// 获取数据库中列表信息
 
-	SqliteManager(const SqliteManager&) = delete;
+	SqliteManager(const SqliteManager&) = delete;		// 屏蔽拷贝构造和赋值拷贝
 	SqliteManager& operator=(const SqliteManager&) = delete;
 private:
 	sqlite3* _db;	// 数据库对象
@@ -48,11 +49,11 @@ private:
 class DataManager
 {
 public:
-	void Init();	// 建表，打开数据库
-	void GetDoc(const string& path, set<string>& dbset);	// 查找path下的所有子文档
-	void InsertDoc(const string& path, const string& name);
-	void DeleteDoc(const string& path, const string& name);
-	void Search(const string& key, vector<std::pair<string, string>>& docinfos);
+	void Init();	// 数据库初始化（打开数据库，建表）
+	void GetDoc(const string& path, set<string>& dbset);	// 查找path下的所有子文档，放到set中用于比对
+	void InsertDoc(const string& path, const string& name);		// 插入到数据库
+	void DeleteDoc(const string& path, const string& name);		// 删除数据库中数据
+	void Search(const string& key, vector<std::pair<string, string>>& docinfos);	// 快速搜索
 private:
 	SqliteManager _dbmgr;
 };
