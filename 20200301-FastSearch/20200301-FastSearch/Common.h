@@ -6,6 +6,7 @@
 #include <set>
 #include <io.h>
 #include <assert.h>
+#include <thread>
 
 #include <windows.h>
 
@@ -19,7 +20,7 @@ using std::vector;
 using std::set;
 
 #define __DEBUG__
-#define __TRACE__
+//#define __TRACE__
 
 // д©б╪ап╬ы
 static void DirectoryList(const string& path, vector<string>& dirs, vector<string>& files) {

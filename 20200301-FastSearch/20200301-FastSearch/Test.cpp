@@ -58,28 +58,42 @@ void TestSqlite() {
 }
 
 void TestScanManager() {
-	ScanManager scanmgr;
-	scanmgr.Scan("E:\\Projects\\20200301-FastSearch\\20200301-FastSearch\\Test");
+	//ScanManager scanmgr;
+	//scanmgr.Scan("E:\\Projects\\20200301-FastSearch\\20200301-FastSearch\\Test");
 }
 
 void TestSearch() {
-	ScanManager scanmgr;
-	scanmgr.Scan("E:\\Projects\\20200301-FastSearch\\20200301-FastSearch\\Test");
-	
-	DataManager datamgr;
-	datamgr.Init();
+	//ScanManager scanmgr;
+	//scanmgr.Scan("E:\\Projects\\20200301-FastSearch\\20200301-FastSearch\\Test");
+	ScanManager::CreateInstance();
+
+	//DataManager datamgr;
+	//datamgr.Init();
 	string key;
 	vector<std::pair<string, string>> docinfos;
+	cout << "==============================================================================================" << endl;
+	cout << "=================================== 快 --- 速 --- 搜 --- 索 ==================================" << endl;
 	cout << "==============================================================================================" << endl;
 	cout << "请输入要搜索的关键字：";
 	while (cin >> key) {
 		docinfos.clear();
-		datamgr.Search(key, docinfos);
-		printf("%-30s %-30s\n", "名称", "路径");
+		DataManager::GetInstance()->Search(key, docinfos);
+		printf("%-30s %-50s\n", "名称", "路径");
 		cout << "----------------------------------------------------------------------------------------------" << endl;
 		for (const auto& e : docinfos) {
 			//cout << e.first << '\t' << '\t' << '\t' << e.second << endl;
-			printf("%-30s %-30s\n", e.first.c_str(), e.second.c_str());
+			//printf("%-30s %-50s\n", e.first.c_str(), e.second.c_str());
+			const string& name = e.first;
+			const string& path = e.second;
+			string prefix, highlight, suffix;
+			DataManager::GetInstance()->SplitHighLight(key, name.c_str(), prefix, highlight, suffix);
+			cout << prefix;
+			ColourPrintf(highlight.c_str());
+			cout << suffix;
+			for (size_t i = name.size(); i < 30; ++i) {		//补齐空格
+				cout << " ";
+			}
+			printf("%-50s\n", path.c_str());
 		}
 		cout << "==============================================================================================" << endl;
 		cout << "请输入要搜索的关键字：";
@@ -118,8 +132,8 @@ void TestHighlight() {
 		string prefix, highlight, suffix;
 		if (pos != string::npos) {
 			size_t str_i = 0, str_j = 0, py_i = 0;
-			char chinese[3] = { 0 };
 			while (py_i < pos) {
+				char chinese[3] = { 0 };
 				chinese[0] = str[str_i];
 				chinese[1] = str[str_i + 1];
 				string ch_pinyin = ChineseConvertPinYinAllSpell(chinese);
@@ -129,6 +143,7 @@ void TestHighlight() {
 			prefix = str.substr(0, str_i);		// 第一段
 			str_j = str_i;
 			while (py_i < pos + key_pinyin.size()) {
+				char chinese[3] = { 0 };
 				chinese[0] = str[str_j];
 				chinese[1] = str[str_j + 1];
 				string ch_pinyin = ChineseConvertPinYinAllSpell(chinese);
@@ -145,6 +160,57 @@ void TestHighlight() {
 			cout << "无匹配内容" << endl;
 		}
  	}
+	//2.key是拼音->高亮对应汉字（解决汉字英文混合问题）
+	{
+		string key = "youxiu";
+		string str = "a你是b那c么优秀d的人e";
+		string key_pinyin = ChineseConvertPinYinAllSpell(key);
+		string str_pinyin = ChineseConvertPinYinAllSpell(str);
+		size_t pos = str_pinyin.find(key_pinyin);
+		string prefix, highlight, suffix;
+		if (pos != string::npos) {
+			size_t str_i = 0, str_j = 0, py_i = 0;
+			while (py_i < pos) {
+				if (str[str_i] >= 0 && str[str_i] <= 127) {	//如果是ASCII字符
+					++str_i;
+					++py_i;
+				}
+				else{
+					char chinese[3] = { 0 };
+					chinese[0] = str[str_i];
+					chinese[1] = str[str_i + 1];
+					string ch_pinyin = ChineseConvertPinYinAllSpell(chinese);
+					py_i += ch_pinyin.size();
+					str_i += 2;
+				}
+			}
+			prefix = str.substr(0, str_i);		// 第一段
+			str_j = str_i;
+			while (py_i < pos + key_pinyin.size()) {
+				if (str[str_j] >= 0 && str[str_j] <= 127) {	//如果是ASCII字符
+					++str_j;
+					++py_i;
+				}
+				else {
+					char chinese[3] = { 0 };
+					chinese[0] = str[str_j];
+					chinese[1] = str[str_j + 1];
+					string ch_pinyin = ChineseConvertPinYinAllSpell(chinese);
+					py_i += ch_pinyin.size();
+					str_j += 2;
+				}
+			}
+			highlight = str.substr(str_i, str_j - str_i);		// 匹配段
+			suffix = str.substr(str_j, string::npos);		// 第三段
+			cout << prefix;
+			ColourPrintf(highlight.c_str());
+			cout << suffix << endl;
+		}
+		else {
+			cout << "无匹配内容" << endl;
+		}
+	}
+
 	//3.key是拼音首字母->高亮对应汉字
 	{
 		string key = "yx";
@@ -155,8 +221,8 @@ void TestHighlight() {
 		string prefix, highlight, suffix;
 		if (pos != string::npos) {
 		//	size_t str_i = 0, str_j = 0, py_i = 0;
-		//	char chinese[3] = { 0 };
 		//	while (py_i < pos) {
+		//		char chinese[3] = { 0 };
 		//		chinese[0] = str[str_i];
 		//		chinese[1] = str[str_i + 1];
 		//		string ch_py_initials = ChineseConvertPinYinInitials(chinese);
@@ -166,6 +232,7 @@ void TestHighlight() {
 		//	prefix = str.substr(0, str_i);		// 第一段
 		//	str_j = str_i;
 		//	while (py_i < pos + key_py_initials.size()) {
+		//		char chinese[3] = { 0 };
 		//		chinese[0] = str[str_j];
 		//		chinese[1] = str[str_j + 1];
 		//		string ch_py_initials = ChineseConvertPinYinInitials(chinese);
@@ -186,14 +253,82 @@ void TestHighlight() {
 			cout << "无匹配内容" << endl;
 		}
 	}
+	//3.key是拼音首字母->高亮对应汉字（解决汉字英文混合问题）
+	{
+		string key = "yx";
+		string str = "a你是b那c么优秀d的人e";
+		string key_py_initials = ChineseConvertPinYinInitials(key);
+		string str_py_initials = ChineseConvertPinYinInitials(str);
+		size_t pos = str_py_initials.find(key_py_initials);
+		string prefix, highlight, suffix;
+		if (pos != string::npos) {
+			size_t str_i = 0, str_j = 0, py_i = 0;
+			while (py_i < pos) {
+				if (str[str_i] >= 0 && str[str_i] <= 127) {	//如果是ASCII字符
+					++str_i;
+					++py_i;
+				}
+				else {
+					char chinese[3] = { 0 };
+					chinese[0] = str[str_i];
+					chinese[1] = str[str_i + 1];
+					string ch_py_initials = ChineseConvertPinYinInitials(chinese);
+					py_i += ch_py_initials.size();
+					str_i += 2;
+				}
+			}
+			prefix = str.substr(0, str_i);		// 第一段
+			str_j = str_i;
+			while (py_i < pos + key_py_initials.size()) {
+				if (str[str_i] >= 0 && str[str_i] <= 127) {	//如果是ASCII字符
+					++str_i;
+					++py_i;
+				}
+				else {
+					char chinese[3] = { 0 };
+					chinese[0] = str[str_j];
+					chinese[1] = str[str_j + 1];
+					string ch_py_initials = ChineseConvertPinYinInitials(chinese);
+					py_i += ch_py_initials.size();
+					str_j += 2;
+				}
+			}
+			highlight = str.substr(str_i, str_j - str_i);		// 匹配段
+			suffix = str.substr(str_j, string::npos);		// 第三段
+			cout << prefix;
+			ColourPrintf(highlight.c_str());
+			cout << suffix << endl;
+		}
+		else {
+			cout << "无匹配内容" << endl;
+		}
+	}
+}
+void TestIsChinese() {
+	string temp = "125可口a可乐efg";
+	int i = 0;
+	while (i != temp.size())
+	{
+		if (temp[i] >= 0 && temp[i] <= 127)
+		{
+			cout << temp.substr(i, 1) << endl;
+			++i;
+		}
+		else
+		{
+			cout << "          " << temp.substr(i, 2) << endl;
+			i += 2;
+		}
+	}
 }
 
 int main() {
 	//TestDirectoryList();
 	//TestSqlite();
 	//TestScanManager();
-	//TestSearch();
+	TestSearch();
 	//TestPinyin();
-	TestHighlight();
+	//TestHighlight();
+	//TestIsChinese();
 	return 0;
 }

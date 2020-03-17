@@ -45,15 +45,24 @@ private:
 // 数据管理模块
 #define DB_NAME "doc.db"
 #define TB_NAME "tb_doc"
-
+//为了方便加锁,设计成单例模式
+//一般使用饿汉模式,不用考虑线程安全问题哦
 class DataManager
 {
 public:
+	static DataManager* GetInstance() {
+		static DataManager datamgr;
+		datamgr.Init();
+		return &datamgr;
+	}
+
 	void Init();	// 数据库初始化（打开数据库，建表）
 	void GetDoc(const string& path, set<string>& dbset);	// 查找path下的所有子文档，放到set中用于比对
 	void InsertDoc(const string& path, const string& name);		// 插入到数据库
 	void DeleteDoc(const string& path, const string& name);		// 删除数据库中数据
 	void Search(const string& key, vector<std::pair<string, string>>& docinfos);	// 快速搜索
+	void SplitHighLight(const string& key, const string& name, string& prefix, string& highlight, string& suffix);	// 把需要高亮的分割出来
 private:
+	DataManager() {}
 	SqliteManager _dbmgr;
 };

@@ -13,18 +13,18 @@ void ScanManager::Scan(const string& path) {
 	localset.insert(localfiles.begin(), localfiles.end());
 
 	set<string> dbset;
-	_datamgr.GetDoc(path, dbset);		// 将数据库中的数据放到set中，为后序比对做准备
+	DataManager::GetInstance()->GetDoc(path, dbset);		// 将数据库中的数据放到set中，为后序比对做准备
 
 	// 开始比对
 	auto localit = localset.begin();
 	auto dbit = dbset.begin();
 	while (localit != localset.end() && dbit != dbset.end()) {
 		if (*localit < *dbit) {		// 本地有，数据库没有，数据库新增
-			_datamgr.InsertDoc(path, *localit);
+			DataManager::GetInstance()->InsertDoc(path, *localit);
 			++localit;
 		}
 		else if (*localit > *dbit) {		// 本地没有，数据库有，数据库删除
-			_datamgr.DeleteDoc(path, *dbit);
+			DataManager::GetInstance()->DeleteDoc(path, *dbit);
 			++dbit;
 		}
 		else {		// 本地和数据库一致，数据不变
@@ -33,11 +33,11 @@ void ScanManager::Scan(const string& path) {
 		}
 	}
 	while (localit != localset.end()) {
-		_datamgr.InsertDoc(path, *localit);	// 数据库新增
+		DataManager::GetInstance()->InsertDoc(path, *localit);	// 数据库新增
 		++localit;
 	}
 	while (dbit != dbset.end()) {
-		_datamgr.DeleteDoc(path, *dbit);	// 数据库删除
+		DataManager::GetInstance()->DeleteDoc(path, *dbit);	// 数据库删除
 		++dbit;
 	}
 	// 递归比对子目录数据

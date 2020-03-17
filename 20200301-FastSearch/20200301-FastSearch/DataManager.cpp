@@ -107,3 +107,172 @@ void DataManager::Search(const string& key, vector<std::pair<string, string>>& d
 		docinfos.push_back(std::make_pair(ppRet[i * col], ppRet[i * col + 1]));
 	}
 }
+void DataManager::SplitHighLight(const string& key, const string& name, string& prefix, string& highlight, string& suffix) {
+	//1.key是汉字->高亮对应汉字
+	{
+		size_t pos = name.find(key);
+		if (pos != string::npos) {
+			prefix = name.substr(0, pos);
+			highlight = key;
+			suffix = name.substr(pos + key.size(), string::npos);
+
+			return;
+		}
+	}
+	//2.key是拼音->高亮对应汉字（解决汉字英文混合问题）
+	//{
+	//	string key_pinyin = ChineseConvertPinYinAllSpell(key);
+	//	string name_pinyin = ChineseConvertPinYinAllSpell(name);
+	//	size_t pos = name_pinyin.find(key_pinyin);
+	//	if (pos != string::npos) {
+	//		size_t name_i = 0, name_j = 0, py_i = 0;
+	//		while (py_i < pos) {
+	//			if (name[name_i] >= 0 && name[name_i] <= 127) {	//如果是ASCII字符
+	//				++name_i;
+	//				++py_i;
+	//			}
+	//			else {
+	//				char chinese[3] = { 0 };
+	//				chinese[0] = name[name_i];
+	//				chinese[1] = name[name_i + 1];
+	//				string ch_pinyin = ChineseConvertPinYinAllSpell(chinese);
+	//				py_i += ch_pinyin.size();
+	//				name_i += 2;
+	//			}
+	//		}
+	//		prefix = name.substr(0, name_i);		// 第一段
+	//		name_j = name_i;
+	//		while (py_i < pos + key_pinyin.size()) {
+	//			if (name[name_j] >= 0 && name[name_j] <= 127) {	//如果是ASCII字符
+	//				++name_j;
+	//				++py_i;
+	//			}
+	//			else {
+	//				char chinese[3] = { 0 };
+	//				chinese[0] = name[name_j];
+	//				chinese[1] = name[name_j + 1];
+	//				string ch_pinyin = ChineseConvertPinYinAllSpell(chinese);
+	//				py_i += ch_pinyin.size();
+	//				name_j += 2;
+	//			}
+	//		}
+	//		highlight = name.substr(name_i, name_j - name_i);		// 匹配段
+	//		suffix = name.substr(name_j, string::npos);		// 第三段
+	
+	//		return;
+	//	}
+	//}
+	// 由于两个while的逻辑大部分相似，可以合并两个while
+	{
+		string key_ap = ChineseConvertPinYinAllSpell(key);	//key转拼音
+		string name_ap = ChineseConvertPinYinAllSpell(name);	//原串转拼音
+		size_t ap_start = name_ap.find(key_ap);	//找到拼音匹配位置
+		size_t ap_end = ap_start + key_ap.size();
+		size_t ap_index = 0;	//原串转成拼音中的指针（并不是指针，只是为了方便表示而已）
+		size_t ht_index = 0;	//原串汉字中的指针
+		size_t ht_start = 0, ht_len = 0;		//高亮长度
+		if (ap_start != string::npos) {
+			while (ap_index < ap_end) {
+				if (ap_index == ap_start) {		// 当拼音匹配时，原串匹配，就找到了高亮的开始
+					ht_start = ht_index;
+				}
+				if (name[ht_index] >= 0 && name[ht_index] <= 127) {	//如果是ASCII字符
+					++ht_index;
+					++ap_index;
+				}
+				else {
+					char chinese[3] = { '\0' };
+					chinese[0] = name[ht_index];
+					chinese[1] = name[ht_index + 1];
+					string py_str = ChineseConvertPinYinAllSpell(chinese);
+					ap_index += py_str.size();	//跳过该汉字拼音的长度
+					ht_index += 2;	//gbk汉字两个字符
+				}
+			}
+			ht_len = ht_index - ht_start;
+
+			prefix = name.substr(0, ht_start);
+			highlight = name.substr(ht_start, ht_len);
+			suffix = name.substr(ht_start + ht_len, string::npos);
+
+			return;
+		}
+	}
+	//3.key是拼音首字母->高亮对应汉字（解决汉字英文混合问题）
+	//{
+	//	string key_py_initials = ChineseConvertPinYinInitials(key);
+	//	string name_py_initials = ChineseConvertPinYinInitials(name);
+	//	size_t pos = name_py_initials.find(key_py_initials);
+	//	if (pos != string::npos) {
+	//		size_t name_i = 0, name_j = 0, py_i = 0;
+	//		while (py_i < pos) {
+	//			if (name[name_i] >= 0 && name[name_i] <= 127) {	//如果是ASCII字符
+	//				++name_i;
+	//				++py_i;
+	//			}
+	//			else {
+	//				char chinese[3] = { 0 };
+	//				chinese[0] = name[name_i];
+	//				chinese[1] = name[name_i + 1];
+	//				string ch_py_initials = ChineseConvertPinYinInitials(chinese);
+	//				py_i += ch_py_initials.size();
+	//				name_i += 2;
+	//			}
+	//		}
+	//		prefix = name.substr(0, name_i);		// 第一段
+	//		name_j = name_i;
+	//		while (py_i < pos + key_py_initials.size()) {
+	//			if (name[name_i] >= 0 && name[name_i] <= 127) {	//如果是ASCII字符
+	//				++name_i;
+	//				++py_i;
+	//			}
+	//			else {
+	//				char chinese[3] = { 0 };
+	//				chinese[0] = name[name_j];
+	//				chinese[1] = name[name_j + 1];
+	//				string ch_py_initials = ChineseConvertPinYinInitials(chinese);
+	//				py_i += ch_py_initials.size();
+	//				name_j += 2;
+	//			}
+	//		}
+	//		highlight = name.substr(name_i, name_j - name_i);		// 匹配段
+	//		suffix = name.substr(name_j, string::npos);		// 第三段
+
+	//		return;
+	//	}
+	//}
+	{
+		string key_it = ChineseConvertPinYinInitials(key);	//key转首字母
+		string name_it = ChineseConvertPinYinInitials(name);	//原串转首字母
+		size_t it_start = name_it.find(key_it);
+		size_t it_end = it_start + key_it.size();
+		size_t it_index = 0;	//原串转成首字母中的指针（并不是指针，只是为了方便表示而已）
+		size_t ht_index = 0;	//原串汉字中的指针
+		size_t ht_start = 0, ht_len = 0;		//高亮长度
+		if (it_start != string::npos) {
+			while (it_index < it_end) {
+				if (it_index == it_start) {
+					ht_start = ht_index;
+				}
+				if (name[ht_index] >= 0 && name[ht_index] <= 127) {	//如果是ASCII字符
+					++ht_index;
+					++it_index;
+				}
+				else {
+					++it_index;	//跳过该汉字首字母
+					ht_index += 2;	//gbk汉字两个字符
+				}
+			}
+			ht_len = ht_index - ht_start;
+
+			prefix = name.substr(0, ht_start);
+			highlight = name.substr(ht_start, ht_len);
+			suffix = name.substr(ht_start + ht_len, string::npos);
+
+			return;
+		}
+	}
+	// 如果高亮没有匹配到，将原串给第一段，中间段和第三段为空就好
+	TRACE_LOG("Split highlight no match. name: %s, key: %s\n", name.c_str(), key.c_str());
+	prefix = name;
+}
