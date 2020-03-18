@@ -7,6 +7,7 @@
 // DCL 数据控制语言，主要负责权限管理和事务代表指令：grant，revoke，commit
 
 void SqliteManager::Open(const string& path) {
+	//cout << "打开数据库" << endl;
 	int ret = sqlite3_open(path.c_str(), &_db);
 	if (ret == SQLITE_OK) {		// 如果打开 成功
 		TRACE_LOG("sqlite3_open success\n");
@@ -16,6 +17,7 @@ void SqliteManager::Open(const string& path) {
 	}
 }
 void SqliteManager::Close() {
+	//cout << "关闭数据库" << endl;
 	int ret = sqlite3_close(_db);
 	if (ret == SQLITE_OK) {		// 如果关闭 成功
 		TRACE_LOG("sqlite3_close success\n");
@@ -48,9 +50,17 @@ void SqliteManager::GetTable(const string& sql, int& row, int& col, char**& ppRe
 		sqlite3_free(errmsg);
 	}
 }
+static bool i = true;
 ////////////////////////////////////////////////////////
 void DataManager::Init() {
-	_dbmgr.Open(DB_NAME);
+	if (i) {
+		_dbmgr.Open(DB_NAME);
+		i = false;
+	}
+	//else {
+	//	cout << "已打开过数据库，无需重复打开！" << endl;
+	//}
+	std::unique_lock<std::mutex> lock(_mtx);
 	char createtb_sql[256];
 	sprintf(createtb_sql, "create table if not exists %s (id integer primary key, path text, name text, name_pinyin text, name_initials text)", TB_NAME);	// 完整地建表
 	_dbmgr.ExecuteSql(createtb_sql);
@@ -60,7 +70,9 @@ void DataManager::GetDoc(const string& path, set<string>& dbset) {
 	sprintf(query_sql, "select name from %s where path = '%s'", TB_NAME, path.c_str());
 	int row, col;
 	char** ppRet;
+	std::unique_lock<std::mutex> lock(_mtx);
 	AutoGetTable agt(_dbmgr, query_sql, row, col, ppRet);
+	lock.unlock();
 	for (int i = 1; i <= row; ++i) {
 		for (int j = 0; j < col; ++j) {
 			dbset.insert(ppRet[i * col + j]);
@@ -72,6 +84,7 @@ void DataManager::InsertDoc(const string& path, const string& name) {
 	string pinyin = ChineseConvertPinYinAllSpell(name);
 	string initials = ChineseConvertPinYinInitials(name);
 	sprintf(insert_sql, "insert into %s (path, name, name_pinyin, name_initials) values('%s', '%s', '%s', '%s')", TB_NAME, path.c_str(), name.c_str(), pinyin.c_str(), initials.c_str());
+	std::unique_lock<std::mutex> lock(_mtx);
 	_dbmgr.ExecuteSql(insert_sql);
 }
 void DataManager::DeleteDoc(const string& path, const string& name) {
@@ -83,6 +96,7 @@ void DataManager::DeleteDoc(const string& path, const string& name) {
 	path_ += '\\';
 	path_ += name;
 	sprintf(delete_sql, "delete from %s where path like '%s%%'", TB_NAME, path_.c_str());
+	std::unique_lock<std::mutex> lock(_mtx);
 	_dbmgr.ExecuteSql(delete_sql);
 }
 void DataManager::Search(const string& key, vector<std::pair<string, string>>& docinfos) {
@@ -102,7 +116,9 @@ void DataManager::Search(const string& key, vector<std::pair<string, string>>& d
 	sprintf(search_sql, "select name, path from %s where name_pinyin like '%%%s%%' or name_initials like '%%%s%%'", TB_NAME, key_pinyin.c_str(), key_initials.c_str());
 	int row, col;
 	char** ppRet;
+	std::unique_lock<std::mutex> lock(_mtx);
 	AutoGetTable agt(_dbmgr, search_sql, row, col, ppRet);
+	lock.unlock();
 	for (int i = 1; i <= row; ++i) {
 		docinfos.push_back(std::make_pair(ppRet[i * col], ppRet[i * col + 1]));
 	}

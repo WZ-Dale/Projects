@@ -7,6 +7,7 @@
 #include <io.h>
 #include <assert.h>
 #include <thread>
+#include <mutex>
 
 #include <windows.h>
 
@@ -42,6 +43,7 @@ static void DirectoryList(const string& path, vector<string>& dirs, vector<strin
 			files.push_back(file.name);
 		}
 	} while (_findnext(handle, &file) == 0);	//	ÓÒÐÖµÜ
+	_findclose(handle);			//_findfirstº¯Êý·µ»Ø»ØÀ´µÄ¾ä±ú
 }
 
 // ÑÕÉ«¸ßÁÁÏÔÊ¾Ò»¶Î×Ö·û´®

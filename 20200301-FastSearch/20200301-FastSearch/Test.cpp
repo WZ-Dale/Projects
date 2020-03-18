@@ -321,7 +321,20 @@ void TestIsChinese() {
 		}
 	}
 }
-
+void TestDL() {
+	Singleton::GetInstance()->Cout();
+	Singleton::GetInstance()->Cout();
+}
+void TestDL1() {
+	Singleton::GetInstance()->Cout();
+	Singleton::GetInstance()->Cout();
+}
+void PtrSizeof() {
+	int a[5] = { 0 };
+	int* ptr_a = a;
+	cout << sizeof(a) << endl;
+	cout << sizeof(ptr_a) << endl;
+}
 int main() {
 	//TestDirectoryList();
 	//TestSqlite();
@@ -330,5 +343,8 @@ int main() {
 	//TestPinyin();
 	//TestHighlight();
 	//TestIsChinese();
+	//TestDL();
+	//TestDL1();
+	//PtrSizeof();
 	return 0;
 }

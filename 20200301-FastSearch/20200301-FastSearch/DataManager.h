@@ -55,7 +55,6 @@ public:
 		datamgr.Init();
 		return &datamgr;
 	}
-
 	void Init();	// 数据库初始化（打开数据库，建表）
 	void GetDoc(const string& path, set<string>& dbset);	// 查找path下的所有子文档，放到set中用于比对
 	void InsertDoc(const string& path, const string& name);		// 插入到数据库
@@ -65,4 +64,5 @@ public:
 private:
 	DataManager() {}
 	SqliteManager _dbmgr;
+	std::mutex _mtx;
 };
