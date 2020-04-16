@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>718</width>
+    <height>527</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>智能志愿报考神器</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>favicon13.ico</normaloff>favicon13.ico</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>姓 名：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="name"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>文/理 科：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>分 数：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="score"/>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>查 询</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>展示你想看的</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QTableView" name="tableView"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>718</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actSelectUniversities"/>
+   <addaction name="actUniversities"/>
+   <addaction name="actScoreLine"/>
+   <addaction name="actSort"/>
+   <addaction name="separator"/>
+   <addaction name="actExit"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actSelectUniversities">
+   <property name="icon">
+    <iconset>
+     <normaloff>favicon0.ico</normaloff>favicon0.ico</iconset>
+   </property>
+   <property name="text">
+    <string>大学筛选</string>
+   </property>
+   <property name="toolTip">
+    <string>根据你填写的信息筛选出合适的大学</string>
+   </property>
+  </action>
+  <action name="actUniversities">
+   <property name="icon">
+    <iconset>
+     <normaloff>favicon1.ico</normaloff>favicon1.ico</iconset>
+   </property>
+   <property name="text">
+    <string>查询大学</string>
+   </property>
+   <property name="toolTip">
+    <string>查询大学分数线</string>
+   </property>
+  </action>
+  <action name="actScoreLine">
+   <property name="icon">
+    <iconset>
+     <normaloff>favicon3.ico</normaloff>favicon3.ico</iconset>
+   </property>
+   <property name="text">
+    <string>分数线</string>
+   </property>
+   <property name="toolTip">
+    <string>查看各省分数线</string>
+   </property>
+  </action>
+  <action name="actSort">
+   <property name="icon">
+    <iconset>
+     <normaloff>favicon2.ico</normaloff>favicon2.ico</iconset>
+   </property>
+   <property name="text">
+    <string>大学排名</string>
+   </property>
+   <property name="toolTip">
+    <string>查看全国大学排名</string>
+   </property>
+  </action>
+  <action name="actExit">
+   <property name="icon">
+    <iconset>
+     <normaloff>favicon17.ico</normaloff>favicon17.ico</iconset>
+   </property>
+   <property name="text">
+    <string>退出</string>
+   </property>
+   <property name="toolTip">
+    <string>退出系统</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>358</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

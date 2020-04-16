@@ -23,7 +23,20 @@
 //#include "E:\Projects\Opencv3_Demo\4_histogram_finder_imageComparator_integral\finder.h"
 //#include "E:\Projects\Opencv3_Demo\4_histogram_finder_imageComparator_integral\retrieve.h"
 //#include "E:\Projects\Opencv3_Demo\4_histogram_finder_imageComparator_integral\integrals.h"
-#include "E:\Projects\Opencv3_Demo\4_histogram_finder_imageComparator_integral\tracking.h"
+//#include "E:\Projects\Opencv3_Demo\4_histogram_finder_imageComparator_integral\tracking.h"
+//5
+//#include "E:\Projects\Opencv3_Demo\5_morphology_segment_mserFeatures\morphology.h"
+//#include "E:\Projects\Opencv3_Demo\5_morphology_segment_mserFeatures\segment.h"
+//#include "E:\Projects\Opencv3_Demo\5_morphology_segment_mserFeatures\mserFeatures.h"
+//6
+//#include "E:\Projects\Opencv3_Demo\6_filters_laplacianZC_derivatives\filters.h"
+//#include "E:\Projects\Opencv3_Demo\6_filters_laplacianZC_derivatives\derivatives.h"
+//7
+//#include "E:\Projects\Opencv3_Demo\7_linefinder_edgedetector_contours_blobs\contours.h"
+//#include "E:\Projects\Opencv3_Demo\7_linefinder_edgedetector_contours_blobs\blobs.h"
+//8
+//#include "E:\Projects\Opencv3_Demo\8_harrisDetector_interestPoints\interestPoints.h"
+
 
 
 using namespace std;
@@ -50,7 +63,23 @@ int main() {
 	//finder_Test();
 	//retrieve_Test();
 	//integral_Test();
-	tracking_Test();
+	//tracking_Test();
+//5
+	//morphology_Test();
+	//segment_Test();
+	//mserFeatures_Test();
+//6
+	//filters_Test();
+	//derivatives_Test();
+//7
+	//contours_Test();
+	//blobs_Test();
+//8
+	//interestPoints_Test();
+
+
+
+
 
 	//destroyAllWindows();
 	waitKey(0);
