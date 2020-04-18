@@ -1,5 +1,8 @@
 #include "TireTest.h"
 
+cv::Mat srcImage;
+cv::Mat dstImage;
+
 void onMouse(int event, int x, int y, int flags, void* param) {
 	cv::Mat *im = reinterpret_cast<cv::Mat*>(param);
 	// 调度事件
@@ -14,10 +17,10 @@ void onMouse(int event, int x, int y, int flags, void* param) {
 }
 void ShowImage(const cv::String &str, cv::Mat &image) {
 	// 若读到图，并输出显示图片分辨率和通道数
-	std::cout << "This image is " << image.rows << " x " << image.cols << std::endl;
-	std::cout << "This image has " << image.channels() << " channel(s)" << std::endl;
+	//std::cout << "This image is " << image.rows << " x " << image.cols << std::endl;
+	//std::cout << "This image has " << image.channels() << " channel(s)" << std::endl;
 	// 定义窗口（choice），显示图像
-	cv::namedWindow(str);
+	cv::namedWindow(str, cv::WINDOW_NORMAL);
 	cv::imshow(str, image);
 	// 注册回调函数，鼠标事件
 	cv::setMouseCallback(str, onMouse, reinterpret_cast<void*>(&image));
@@ -80,8 +83,28 @@ void LargestConnectedComponent(cv::Mat srcImage, cv::Mat &dstImage)
 	labels.convertTo(dstImage, CV_8U);
 }
 
-cv::Mat srcImage;
-cv::Mat dstImage;
+
+int binarization = 50; // bar 的初值，也是阈值的初值
+int binarization_max_vale = 255; // 阈值的最大值
+int binarization_bar_max_value = 255; // bar的最大值
+void ChangeBinarizationValue(cv::Mat inputImage, cv::Mat outputImage)
+{
+	cv::threshold(srcImage, dstImage, binarization, binarization_max_vale, cv::THRESH_BINARY); // 二值化
+	cv::Mat image_connect;
+	LargestConnectedComponent(dstImage, image_connect);
+	cv::imshow("BinarizationWin", image_connect);
+}
+void ChangeBinarization(int, void*)
+{
+	ChangeBinarizationValue(srcImage, dstImage);
+}
+void BarbinarizationFun(cv::Mat inputImage, cv::Mat outputImage)
+{
+	cv::namedWindow("BinarizationWin", cv::WINDOW_NORMAL);
+	cv::createTrackbar("binarization bar", "BinarizationWin", &binarization, binarization_bar_max_value, ChangeBinarization);
+	ChangeBinarization(binarization, 0);
+}
+
 
 int threshold1 = 100; // bar 的初值，也是阈值的初值
 int threshold2 = 150; // bar 的初值，也是阈值的初值
@@ -108,31 +131,10 @@ void ThresholdFun(cv::Mat inputImage, cv::Mat outputImage)
 	ChangeThreshold2(threshold2, 0);
 }
 
-int binarization = 100; // bar 的初值，也是阈值的初值
-int binarization_max_vale = 255; // 阈值的最大值
-int binarization_bar_max_value = 255; // bar的最大值
-void ChangeBinarizationValue(cv::Mat inputImage, cv::Mat outputImage)
-{
-	cv::threshold(srcImage, dstImage, binarization, binarization_max_vale, cv::THRESH_BINARY); // 二值化
-	cv::imshow("BinarizationWin", dstImage);
-}
-void ChangeBinarization(int, void*)
-{
-	ChangeBinarizationValue(srcImage, dstImage);
-}
-void BarbinarizationFun(cv::Mat inputImage, cv::Mat outputImage)
-{
-	cv::namedWindow("BinarizationWin");
-	cv::createTrackbar("binarization bar", "BinarizationWin", &binarization, binarization_bar_max_value, ChangeBinarization);
-	ChangeBinarization(binarization, 0);
-}
-
 
 void Test1() {
 // 原图
-	cv::Mat image = cv::imread("11.jpg", cv::IMREAD_GRAYSCALE);
-	//cv::Mat image = cv::imread("11.jpg", cv::IMREAD_COLOR);
-
+	cv::Mat image = cv::imread("22.jpg", cv::IMREAD_GRAYSCALE);
 	// 如果读图错误，则输出提示未读到图，并返回
 	if (image.empty()) {
 		std::cout << "Error reading image..." << std::endl;
@@ -143,33 +145,36 @@ void Test1() {
 
 // 截取图片
 	// 截取指定部分1512
-	int x = 256, y = 1512;
-	cv::Rect rect(x, y, 3024 - 2 * x + 150, 3024 - y);
+	int x = 0, y = image.rows / 4;
+	cv::Rect rect(x, y, image.cols, 3 * y);
 	cv::Mat image_roi = image(rect);
 	//ShowImage("image_roi", image_roi);
 
 // 缩小图片
 	cv::Mat image_min;
 	cv::resize(image_roi, image_min, cv::Size(), 0.2, 0.2);
-	//ShowImage("image_min", image_min);
+	ShowImage("image_min", image_min);
 
 // 直方图均衡化
-	cv::Mat equal_hist;
-	equalizeHist(image_min, equal_hist); //直方图均衡化
+	//cv::Mat equal_hist;
+	//cv::equalizeHist(image_min, equal_hist); //直方图均衡化
 	//ShowImage("equal_hist", equal_hist);
 
-	srcImage = equal_hist;
-// 边缘检测
-	cv::Canny(srcImage, dstImage, threshold1, threshold2);
-	//ShowImage("ThresholdWin", dstImage);
-	// 滑动条边缘检测
-	//ThresholdFun(srcImage, dstImage);
-
+	//srcImage = equal_hist;
+	srcImage = image_min;
 // 二值化
 	//cv::threshold(srcImage, dstImage, binarization, binarization_max_vale, cv::THRESH_BINARY);
 	//ShowImage("BinarizationWin", dstImage);
 	// 滑动条二值化
-	//BarbinarizationFun(srcImage, dstImage);
+	BarbinarizationFun(srcImage, dstImage);
+
+// 边缘检测
+	//cv::Canny(dstImage, dstImage, threshold1, threshold2, 7);
+	//ShowImage("ThresholdWin", dstImage);
+	// 滑动条边缘检测
+	//ThresholdFun(srcImage, dstImage);
+
+/*
 
 // 膨胀操作
 	cv::Mat input = dstImage;
@@ -185,30 +190,30 @@ void Test1() {
 	ShowImage("Erode", output);
 
 // 高级形态学处理
-	cv::morphologyEx(input, output, cv::MORPH_ERODE, element); // 腐蚀
-	ShowImage("MorphologyEx", output);
-	cv::morphologyEx(input, output, cv::MORPH_DILATE, element); // 膨胀
-	ShowImage("MorphologyEx", output);
-	cv::morphologyEx(input, output, cv::MORPH_OPEN, element); // 开运算
-	ShowImage("MorphologyEx", output);
+	//cv::morphologyEx(input, output, cv::MORPH_ERODE, element); // 腐蚀
+	//ShowImage("MorphologyEx", output);
+	//cv::morphologyEx(input, output, cv::MORPH_DILATE, element); // 膨胀
+	//ShowImage("MorphologyEx", output);
+	//cv::morphologyEx(input, output, cv::MORPH_OPEN, element); // 开运算
+	//ShowImage("MorphologyEx", output);
 	cv::morphologyEx(input, output, cv::MORPH_CLOSE, element); // 闭运算
 	ShowImage("MorphologyEx", output);
-	cv::morphologyEx(input, output, cv::MORPH_GRADIENT, element); // 形态学梯度
-	ShowImage("MorphologyEx", output);
-	cv::morphologyEx(input, output, cv::MORPH_TOPHAT, element); // 顶帽
-	ShowImage("MorphologyEx", output);
-	cv::morphologyEx(input, output, cv::MORPH_BLACKHAT, element); // 黑帽
-	ShowImage("MorphologyEx", output);
+	//cv::morphologyEx(input, output, cv::MORPH_GRADIENT, element); // 形态学梯度
+	//ShowImage("MorphologyEx", output);
+	//cv::morphologyEx(input, output, cv::MORPH_TOPHAT, element); // 顶帽
+	//ShowImage("MorphologyEx", output);
+	//cv::morphologyEx(input, output, cv::MORPH_BLACKHAT, element); // 黑帽
+	//ShowImage("MorphologyEx", output);
 
-	//cv::Mat image_connect;
-	//LargestConnectedComponent(image_min, image_connect);
-	//ShowImage("image_connect", image_connect);
+// 最大连通域
+	cv::Mat image_connect;
+	LargestConnectedComponent(dstImage, image_connect);
+	ShowImage("image_connect", image_connect);
 
-	//int initial_value = 50;
-	//int max_value = 255;
-	//createTrackbar("threshold", "Sliding bar", &initial_value, max_value, Changethreshold1);
-	//Changethreshold1(initial_value, 0);
-	//createTrackbar("threshold", "Sliding bar", &initial_value, max_value, Changethreshold2);
-	//Changethreshold2(initial_value, 0);
+// 提取胎冠
+
+
+*/
+
 
 }
