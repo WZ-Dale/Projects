@@ -28,6 +28,6 @@ void LargestConnectedComponent(cv::Mat srcImage, cv::Mat &dstImage);
 
 
 void Test1();
-
+void Test2();
 
 

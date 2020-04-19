@@ -18,8 +18,8 @@ void Test0() {
 
 int main() {
 	//Test0();
-	Test1();
-
+	//Test1();
+	Test2();
 
 
 	cv::waitKey(0); // 0 to indefinitely wait for a key pressed
