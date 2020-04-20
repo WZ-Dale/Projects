@@ -1,25 +1,38 @@
-#include "TireTest.h"
+#include "ExtractTread.h"
+#include "GLCM.h"
+#include "Radon.h"
 
 
 void Test0() {
-	cv::Mat image = cv::imread("11.jpg", cv::IMREAD_GRAYSCALE);
+// 原图
+	cv::Mat image = cv::imread("T05.jpg", cv::IMREAD_GRAYSCALE);
 	if (image.empty()) {
 		std::cout << "Error reading image..." << std::endl;
 		return;
 	}
-	std::cout << "This image is " << image.rows << " x " << image.cols << std::endl;
-	cv::namedWindow("Image");
-	cv::imshow("Image", image);
-	// 注册回调函数，鼠标事件
-	cv::setMouseCallback("Image", onMouse, reinterpret_cast<void*>(&image));
+	//ShowImage("image", image);
 
-	cv::waitKey(0);
+// 截取图片
+	int x = 0, y = image.rows / 4;
+	cv::Rect rect(x, y, image.cols, 2 * y);
+	cv::Mat image_roi = image(rect);
+	//ShowImage("image_roi", image_roi);
+
+// 缩小图片
+	cv::Mat image_min;
+	cv::resize(image_roi, image_min, cv::Size(), 0.2, 0.2);
+	ShowImage("image_min", image_min);
+
+	cv::imwrite("T05.jpg", image_min);
 }
 
-int main() {
+int main(int argc, const char ** argv) {
 	//Test0();
 	//Test1();
-	Test2();
+	//Test2();
+	//Test3();
+	Test4(argc, argv);
+
 
 
 	cv::waitKey(0); // 0 to indefinitely wait for a key pressed
