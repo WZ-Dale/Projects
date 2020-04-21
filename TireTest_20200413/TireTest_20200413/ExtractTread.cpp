@@ -20,7 +20,7 @@ void ShowImage(const cv::String &str, cv::Mat &image) {
 	//std::cout << "This image is " << image.rows << " x " << image.cols << std::endl;
 	//std::cout << "This image has " << image.channels() << " channel(s)" << std::endl;
 	// 定义窗口（choice），显示图像
-	cv::namedWindow(str, cv::WINDOW_NORMAL);
+	cv::namedWindow(str, cv::WINDOW_AUTOSIZE);
 	cv::imshow(str, image);
 	// 注册回调函数，鼠标事件
 	cv::setMouseCallback(str, onMouse, reinterpret_cast<void*>(&image));
@@ -131,7 +131,7 @@ void ThresholdFun(cv::Mat inputImage, cv::Mat outputImage)
 
 void Test1() {
 // 原图
-	cv::Mat image = cv::imread("221.jpg", cv::IMREAD_GRAYSCALE);
+	cv::Mat image = cv::imread("22.jpg", cv::IMREAD_GRAYSCALE);
 	// 如果读图错误，则输出提示未读到图，并返回
 	if (image.empty()) {
 		std::cout << "Error reading image..." << std::endl;
@@ -168,7 +168,7 @@ void Test1() {
 	//cv::threshold(srcImage, dstImage, binarization, binarization_max_vale, cv::THRESH_BINARY);
 	//ShowImage("BinarizationWin", dstImage);
 	// 滑动条二值化
-	//BarbinarizationFun(srcImage, dstImage);
+	BarbinarizationFun(srcImage, dstImage);
 
 // 边缘检测
 	//cv::Canny(dstImage, dstImage, threshold1, threshold2, 7);
@@ -242,7 +242,7 @@ void Test2() {
 // 缩小图片
 	cv::Mat image_min;
 	cv::resize(image_roi, image_min, cv::Size(), 0.2, 0.2);
-	//ShowImage("image_min", image_min);
+	ShowImage("image_min", image_min);
 
 
 // 直方图均衡化
@@ -254,10 +254,11 @@ void Test2() {
 	//srcImage = equal_hist;
 // 二值化
 	cv::threshold(srcImage, dstImage, binarization, binarization_max_vale, cv::THRESH_BINARY);
-	//ShowImage("BinarizationWin", dstImage);
+	ShowImage("BinarizationWin", dstImage);
 
 	cv::Mat input = dstImage;
 	cv::Mat output;
+
 	//获取自定义核
 	cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)); //第一个参数MORPH_RECT表示矩形的卷积核，当然还可以选择椭圆形的、交叉型的
 // 膨胀操作
@@ -265,12 +266,12 @@ void Test2() {
 		cv::dilate(input, output, element);
 		input = output;
 	}
-	//ShowImage("Dilate", output);
+	ShowImage("Dilate", output);
 // 腐蚀操作
 	for (int i = 0; i < 20; ++i) {
 		cv::erode(output, output, element);
 	}
-	//ShowImage("Erode", output);
+	ShowImage("Erode", output);
 
 // 边缘检测
 	cv::Canny(output, dstImage, threshold1, 2 * threshold1, 7, true);
@@ -278,16 +279,16 @@ void Test2() {
 		dstImage.at<uchar>(0, i) = 255;
 		dstImage.at<uchar>(dstImage.rows - 1, i) = 255;
 	}
-	//ShowImage("ThresholdWin", dstImage);
+	ShowImage("ThresholdWin", dstImage);
 	
 // 反色
 	cv::bitwise_not(dstImage, dstImage);
 
-	//ShowImage("bitwise_not", dstImage);
+	ShowImage("bitwise_not", dstImage);
 // 最大连通域
 	cv::Mat image_connect;
 	LargestConnectedComponent(dstImage, image_connect);
-	//ShowImage("image_connect", image_connect);
+	ShowImage("image_connect", image_connect);
 
 // 膨胀操作
 	input = image_connect;
@@ -295,13 +296,13 @@ void Test2() {
 		cv::dilate(input, output, element);
 		input = output;
 	}
-	//ShowImage("Dilate", output);
+	ShowImage("Dilate", output);
 
 // 腐蚀操作
 	for (int i = 0; i < 15; ++i) {
 		cv::erode(output, output, element);
 	}
-	//ShowImage("Erode", output);
+	ShowImage("Erode", output);
 
 
 // 与操作
