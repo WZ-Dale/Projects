@@ -73,4 +73,4 @@ private:
 };
 
 
-int Test3();
+void Test3(const char* ch);

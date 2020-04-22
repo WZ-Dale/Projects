@@ -277,9 +277,9 @@ void GLCM::getGLCMFeatures(VecGLCM& vecGLCM, GLCMFeatures& features)
 //char data[20];
 //const string filename = "T2.jpg";
 
-int Test3()
+void Test3(const char* ch)
 {
-	fstream finout1("data.txt", ios::in | ios::out | ios::trunc);
+	fstream finout1("data.txt", ios::in | ios::out | ios::app);
 	//getFileName();
 	//int i = 0;
 	//char data1[20];
@@ -287,7 +287,7 @@ int Test3()
 	//	strcpy_s(data1, names[i].c_str());
 	//	string imagename = data1;
 		//»Ò¶È¹²Éú¾ØÕó
-		IplImage* img = cvLoadImage("T05.jpg", 0);
+		IplImage* img = cvLoadImage(ch, 0);
 		//cvSetImageROI(img, cvRect(1453, 1149, 557, 557));
 		//cvNamedWindow("ShowSRC");
 		//cvShowImage("ShowSRC",img);
@@ -335,15 +335,23 @@ int Test3()
 		double entropy_average = (entropy_135 + entropy_45 + entropy_hor + entropy_vetical) / 4;
 		double contrast_average = (contrast_135 + contrast_45 + contrast_hor + contrast_vetical) / 4;
 		double idMoment_average = (idMoment_135 + idMoment_45 + idMoment_hor + idMoment_vetical) / 4;
+		
+		static int i = 1;
 
-		cout << "energy_average" << "  " << "entropy_average" << "  " << "contrast_average" << "  " << "idMoment_average" << endl;
-		cout << energy_average << "  " << entropy_average << "  " << contrast_average << "  " << idMoment_average << endl;
-		finout1 << "energy_average" << "  " << "entropy_average" << "  " << "contrast_average" << "  " << "idMoment_average" << endl;
-		finout1 << energy_average << "  " << entropy_average << "  " << contrast_average << "  " << idMoment_average << endl;
+		if (i == 1)
+			cout << "Num" << "\t" << "energy" << "\t\t" << "entropy" << "\t\t" << "contrast" << "\t" << "idMoment" << endl;
+		//cout << "energy_average" << "\t" << "entropy_average" << "\t" << "contrast_average" << "\t" << "idMoment_average" << endl;
+		cout << i << "\t" << energy_average << "\t" << entropy_average << "\t\t" << contrast_average << "\t\t" << idMoment_average << endl;
+
+		if (i == 1)
+			finout1 << "Num" << "\t" << "energy" << "\t\t" << "entropy" << "\t\t" << "contrast" << "\t" << "idMoment" << endl;
+		//finout1 << "energy_average" << "\t" << "entropy_average" << "\t" << "contrast_average" << "\t" << "idMoment_average" << endl;
+		finout1  << i << "\t" << energy_average << "\t" << entropy_average << "\t\t" << contrast_average << "\t\t" << idMoment_average << endl;
+
+		++i;
+
 		//i++;
 	//}
-	system("pause");
-	return 0;
 }
 
 //void getFileName() {

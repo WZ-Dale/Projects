@@ -31,10 +31,20 @@ void Test0() {
 }
 
 int main(int argc, const char ** argv) {
-	Test0();
+	//Test0();
 	//Test1();
 	//Test2();
-	//Test3();
+	for (int i = 1; i < 14; ++i) {
+		cv::String x = to_string(i);
+		cv::String str;
+		if (i < 10) {
+			str = ".//3//30" + x + ".jpg";
+		}
+		else {
+			str = ".//3//3" + x + ".jpg";
+		}
+		Test3(str.c_str());
+	}
 	//Test4(argc, argv);
 
 
