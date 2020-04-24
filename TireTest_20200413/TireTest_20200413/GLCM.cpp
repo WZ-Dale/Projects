@@ -336,19 +336,42 @@ void Test3(const char* ch)
 		double contrast_average = (contrast_135 + contrast_45 + contrast_hor + contrast_vetical) / 4;
 		double idMoment_average = (idMoment_135 + idMoment_45 + idMoment_hor + idMoment_vetical) / 4;
 		
-		static int i = 1;
+		//static int i = 1;
+		//
+		//if (i == 1)
+		//	cout << "Num" << "\t" << "energy" << "\t\t" << "entropy" << "\t\t" << "contrast" << "\t" << "idMoment" << endl;
+		////cout << "energy_average" << "\t" << "entropy_average" << "\t" << "contrast_average" << "\t" << "idMoment_average" << endl;
+		//cout << i << "\t" << energy_average << "\t" << entropy_average << "\t\t" << contrast_average << "\t\t" << idMoment_average << endl;
 
-		if (i == 1)
-			cout << "Num" << "\t" << "energy" << "\t\t" << "entropy" << "\t\t" << "contrast" << "\t" << "idMoment" << endl;
-		//cout << "energy_average" << "\t" << "entropy_average" << "\t" << "contrast_average" << "\t" << "idMoment_average" << endl;
-		cout << i << "\t" << energy_average << "\t" << entropy_average << "\t\t" << contrast_average << "\t\t" << idMoment_average << endl;
+		//if (i == 1)
+		//	finout1 << "Num" << "\t" << "energy" << "\t\t" << "entropy" << "\t\t" << "contrast" << "\t" << "idMoment" << endl;
+		////finout1 << "energy_average" << "\t" << "entropy_average" << "\t" << "contrast_average" << "\t" << "idMoment_average" << endl;
+		//finout1  << i << "\t" << energy_average << "\t" << entropy_average << "\t\t" << contrast_average << "\t\t" << idMoment_average << endl;
 
-		if (i == 1)
-			finout1 << "Num" << "\t" << "energy" << "\t\t" << "entropy" << "\t\t" << "contrast" << "\t" << "idMoment" << endl;
-		//finout1 << "energy_average" << "\t" << "entropy_average" << "\t" << "contrast_average" << "\t" << "idMoment_average" << endl;
-		finout1  << i << "\t" << energy_average << "\t" << entropy_average << "\t\t" << contrast_average << "\t\t" << idMoment_average << endl;
 
-		++i;
+		//++i;
+
+
+		int sum = 0;
+		if (energy_average <= 0.3) {
+			sum += 1;		
+		}
+		else { sum -= 1; }
+		if (entropy_average >= 7.3) {
+			sum += 1;
+		}
+		else { sum -= 1; }
+		if (contrast_average >= 2.2) {
+			sum += 2;
+		}
+		else { sum -= 2; }
+		if (idMoment_average <= 2.11) {
+			sum += 1;
+		}
+		else { sum -= 1; }
+		cout << sum << endl;
+
+			
 
 		//i++;
 	//}
