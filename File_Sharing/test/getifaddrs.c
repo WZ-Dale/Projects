@@ -24,8 +24,8 @@ int main(){
     printf("mask: %s\n", inet_ntoa(mask->sin_addr));
     uint32_t net = ntohl(ip->sin_addr.s_addr & mask->sin_addr.s_addr);
     uint32_t max_host = ~(ntohl(mask->sin_addr.s_addr));
-    int i = 0;
-    for(; i < max_host; ++i){
+    int i;
+    for(i = 1; i < max_host; ++i){
       struct in_addr ip;
       ip.s_addr = htonl(net + i);
       printf("ip%d: %s\n", i, inet_ntoa(ip));
