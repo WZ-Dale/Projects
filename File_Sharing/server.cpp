@@ -23,7 +23,7 @@ class P2PServer
       bf::directory_iterator item_begin(SHAREDFILE);
       bf::directory_iterator item_end;
       std::stringstream body;
-      body << "<html><body>";
+      //body << "<html><body>";
       for(; item_begin != item_end; ++item_begin){
         // 判断是否是目录，如果是目录递归进入
         if(bf::is_directory(item_begin->status())){
@@ -35,12 +35,12 @@ class P2PServer
         std::string name = path.filename().string();
         //std::cerr << path << std::endl;
         rsp.body += name + "\n";
-        body << "<h3><a href='/list/" << name << "'>";
-        body << name;
-        body << "</a></h3>";
+        //body << "<h3><a href='/list/" << name << "'>";
+        //body << name;
+        //body << "</a></h3>";
       }
-      body << "</body></html>";
-      rsp.body = body.str();
+      //body << "</body></html>";
+      //rsp.body = body.str();
       rsp.set_header("Content-Type", "text/html");
       rsp.status = 200;
       //rsp.set_content(&body[0], body.size(), "text/plain");
