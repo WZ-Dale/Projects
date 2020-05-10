@@ -49,6 +49,7 @@ class P2PClient
       return true;
     }
     bool GetOnlineHost(std::vector<std::string> &list){
+      _online_list.clear();
       for(const auto& i : list){
         Client client(&i[0], _srv_port); 
         auto rsp =  client.Get("/hostpair");
@@ -100,6 +101,28 @@ class P2PClient
       return true;
     }
     bool DownloadFile(std::string &name){
+      std::string host = _online_list[_host_idx];
+      std::string uri = "/list/" + name;
+      Client client(host.c_str(), _srv_port);
+      auto rsp = client.Get(uri.c_str());
+      if(rsp && rsp->status == 200){
+        std::string realpath = "Shared/" + name;
+        std::ofstream file(realpath, std::ios::binary);
+        if(!file.is_open()){
+          std::cerr << "file " << realpath << " open failed" << std::endl;
+          return false;
+        }
+        file.write(&rsp->body[0], rsp->body.size());
+        if(!file.good()){
+          std::cerr << "file " << realpath << " write body error" << std::endl;
+          return false;
+        }
+        file.close();
+        std::cout << "file " << realpath << " download success" << std::endl;
+      }
+      else{
+        std::cout << "file " << realpath << " download failed" << std::endl;
+      }
       return true;
     }
     int DoFile(){

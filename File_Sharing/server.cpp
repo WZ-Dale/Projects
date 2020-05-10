@@ -50,6 +50,14 @@ class P2PServer
       bf::path path(req.path);
       std::stringstream name;
       name << SHAREDFILE << "/" + path.filename().string();// 常量字符串相加会出问题
+      if(!bf::exists(name.str())){
+        rsp.status = 404;
+        return;
+      }
+      if(bf::is_directory(name.str())){
+        rsp.status = 403;
+        return;
+      }
       std::ifstream file(name.str(), std::ios::binary); 
       if(!file.is_open()){
         std::cerr << "openfile " << name.str() << " failed!" << std::endl;

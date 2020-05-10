@@ -1,2 +1,5 @@
+all::server client
 server:server.cpp
+	g++ -std=c++11 $^ -o $@ -lboost_filesystem -lboost_system -lpthread
+client:client.cpp
 	g++ -std=c++11 $^ -o $@ -lboost_filesystem -lboost_system -lpthread
