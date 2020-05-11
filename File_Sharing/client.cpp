@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <thread>
 #include <stdio.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
@@ -39,7 +40,7 @@ class P2PClient
         }
         uint32_t net = ntohl(ip->sin_addr.s_addr & mask->sin_addr.s_addr);
         uint32_t max_host = ~(ntohl(mask->sin_addr.s_addr));
-        for(int i = 128; i < max_host; ++i){
+        for(int i = 2; i < max_host - 1; ++i){
           struct in_addr ip;
           ip.s_addr = htonl(net + i);
           list.push_back(inet_ntoa(ip));
@@ -48,18 +49,26 @@ class P2PClient
       freeifaddrs(addrs);
       return true;
     }
+    void HostPair(std::string &i){
+      Client client(i.c_str(), _srv_port); 
+      auto rsp =  client.Get("/hostpair");
+      if(rsp && rsp->status == 200){
+        std::cerr << "host " << i << " pair success" << std::endl;
+        _online_list.push_back(i);
+      }
+      //std::cerr << "host " << i << " pair failed" << std::endl;
+      //fprintf(stderr, "%s\n", i.c_str());
+      return;
+    }
     bool GetOnlineHost(std::vector<std::string> &list){
       _online_list.clear();
-      for(const auto& i : list){
-        Client client(&i[0], _srv_port); 
-        auto rsp =  client.Get("/hostpair");
-        if(rsp && rsp->status == 200){
-          std::cerr << "host " << i << " pair success" << std::endl;
-          _online_list.push_back(i);
-          break;
-          continue;
-        }
-        std::cerr << "host " << i << " pair failed" << std::endl;
+      std::vector<std::thread> thr_list(list.size());
+      for(int i = 0; i < list.size(); ++i){
+        std::thread thr(&P2PClient::HostPair, this, std::ref(list[i]));
+        thr_list[i] = std::move(thr);
+      }
+      for(int i = 0; i < thr_list.size(); ++i){
+        thr_list[i].join();
       }
       return true;
     }
