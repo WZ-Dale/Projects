@@ -8,9 +8,14 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <boost/filesystem.hpp>
+#include <boost/thread.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include "httplib.h"
+
+//#define RANGE_SIZE (1024*1024*100)
+#define RANGE_SIZE (100<<20)
+#define DOWNLOAD "Download"
 
 using namespace httplib;
 namespace bf = boost::filesystem;
@@ -109,30 +114,106 @@ class P2PClient
       name = _file_list[_file_idx];
       return true;
     }
-    bool DownloadFile(std::string &name){
-      std::string host = _online_list[_host_idx];
+    void RangeDownload(std::string host, std::string name, int64_t start, int64_t end, bool *res){
       std::string uri = "/list/" + name;
+      std::string realpath = "Download/" + name;
+      std::stringstream range_val;
+      range_val << "bytes=" << start << "-" << end;
+      *res = false;
       Client client(host.c_str(), _srv_port);
-      auto rsp = client.Get(uri.c_str());
-      if(rsp && rsp->status == 200){
-        std::string realpath = "Shared/" + name;
+      // Range: bytes = start-end;
+      Headers header;
+      header.insert(std::make_pair("Range", range_val.str().c_str()));
+      auto rsp = client.Get(uri.c_str(), header);
+      if(rsp && rsp->status == 206){
         std::ofstream file(realpath, std::ios::binary);
         if(!file.is_open()){
-          std::cerr << "file " << realpath << " open failed" << std::endl;
-          return false;
+          std::cerr << "file " << realpath << " open error" << std::endl;
+          return;
         }
+        file.seekp(start, std::ios::beg); // 跳转到指定位置
         file.write(&rsp->body[0], rsp->body.size());
         if(!file.good()){
-          std::cerr << "file " << realpath << " write body error" << std::endl;
-          return false;
+          std::cerr << "file " << realpath << " write error" << std::endl;
+          file.close();
+          return;
         }
         file.close();
-        std::cout << "file " << realpath << " download success" << std::endl;
+        *res = true;
+        std::cerr << "file " << realpath << " download range: ";
+        std::cerr << range_val.str() << " success" << std::endl;
+      }
+      return;
+    }
+    int64_t GetFileSize(std::string &host, std::string &name){
+      int64_t fsize = -1;
+      std::string uri = "/list/" + name;
+      Client client(host.c_str(), _srv_port);
+      auto rsp = client.Head(uri.c_str());
+      if(rsp && rsp->status == 200){
+        if(!rsp->has_header("Content-Length")){
+          return -1;
+        }
+        std::string len = rsp->get_header_value("Content-Length");
+        std::stringstream tmp;
+        tmp << len;
+        tmp >> fsize;
+      }
+      return fsize;
+    }
+    bool DownloadFile(std::string &name){
+      // 请求首行：GET /list/filename HTTP/1.1
+      // 响应首行：HTTP/1.1 200 OK
+      // 1. 获取文件总长度
+      // 2. 根据文件总长度和分块大小分割线程的下载区域
+      // 3. 创建线程下载指定文件的指定分块数据
+      // 4. 同步等待所有线程结束，获取下载结果
+      std::string host = _online_list[_host_idx];
+      int64_t fsize = GetFileSize(host, name);
+      if(fsize < 0){
+        std::cerr << "download file " << name << " failed" << std::endl;
+        return false;
+      }
+      int count = fsize / RANGE_SIZE;
+      std::vector<boost::thread> thr_list(count + 1);
+      std::vector<bool> res_list(count + 1);
+      for(int i = 0; i <= count; ++i){
+        int64_t start, end, rlen;
+        start = i * RANGE_SIZE;
+        if(i != count){ // 不是最后一块
+          end = start + RANGE_SIZE - 1;
+        }
+        else{ // 是最后一块
+          if(fsize % RANGE_SIZE == 0){ //最后一块为0
+            break;
+          }
+          end = fsize - 1;  // 最后一块不满
+        }
+        rlen = end - start + 1;
+        // Range: bytes = start-end;
+        bool res;
+        boost::thread thr(&P2PClient::RangeDownload, this, host, name, start, end, &res);
+        thr_list[i] = std::move(thr);
+        res_list[i] = std::move(res);
+      }
+      bool ret = true;
+      for(int i = 0; i <= count; ++i){
+        if(i == count && fsize % RANGE_SIZE == 0){
+          break;
+        } 
+        thr_list[i].join();
+        if(res_list[i] == false){
+          ret = false;
+        }
+      }
+      if(ret == true){
+        std::cerr << "download file " << name << " success" << std::endl;
+        return true;
       }
       else{
-        std::cout << "file " << realpath << " download failed" << std::endl;
+        std::cerr << "download file " << name << " failed" << std::endl;
+        return false;
       }
-      return true;
     }
     int DoFile(){
       std::cout << "##################################################" << std::endl;

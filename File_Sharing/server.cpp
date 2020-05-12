@@ -8,7 +8,7 @@
 using namespace httplib;
 namespace bf = boost::filesystem;
 
-#define SHAREDFILE "Share_Download"
+#define SHAREDFILE "Shared"
 #define LOG(fmt, ...) fprintf(stderr, fmt, __VA_ARGS__)
 
 class P2PServer
@@ -46,7 +46,7 @@ class P2PServer
       //rsp.set_content(&body[0], body.size(), "text/plain");
     }
     static void GetFileData(const Request &req, Response &rsp){
-      // /list/a.txt -> /Share_Download/a.txt
+      // /list/a.txt -> /Shared/a.txt
       bf::path path(req.path);
       std::stringstream name;
       name << SHAREDFILE << "/" + path.filename().string();// 常量字符串相加会出问题
