@@ -58,23 +58,65 @@ class P2PServer
         rsp.status = 403;
         return;
       }
-      std::ifstream file(name.str(), std::ios::binary); 
-      if(!file.is_open()){
-        std::cerr << "openfile " << name.str() << " failed!" << std::endl;
-        rsp.status = 404;// 访问资源不存在
-        return;
-      }
       int64_t fsize = bf::file_size(name.str());
-      rsp.body.resize(fsize);
-      file.read(&rsp.body[0], fsize);
-      if(!file.good()){
-        std::cerr << "read file " << name.str() << " body error!" << std::endl;
-        rsp.status = 500;// 服务器内部错误
+      if(req.method == "HEAD"){
+        rsp.status = 200;
+        std::string len = std::to_string(fsize);
+        rsp.set_header("Content-Length", len.c_str());
         return;
       }
-      file.close();
-      rsp.status = 200;
-      rsp.set_header("Content-Type", "application/octet-stream");
+      else{ // 不是HEAD方法就是，GET方法
+        if(!req.has_header("Range")){
+          rsp.status = 400;
+          return;
+        }
+        std::string range_val = req.get_header_value("Range");
+        int64_t start, rlen;
+        bool ret = RangeParse(range_val, start, rlen);
+        if(ret == false){
+          rsp.status = 400;
+          return;
+        }
+        std::ifstream file(name.str(), std::ios::binary); 
+        if(!file.is_open()){
+          std::cerr << "openfile " << name.str() << " failed!" << std::endl;
+          rsp.status = 404;// 访问资源不存在
+          return;
+        }
+        file.seekg(start, std::ios::beg); // 指定位置读
+        rsp.body.resize(rlen);
+        file.read(&rsp.body[0], rlen);
+        if(!file.good()){
+          std::cerr << "read file " << name.str() << " body error!" << std::endl;
+          rsp.status = 500;// 服务器内部错误
+          return;
+        }
+        file.close();
+        rsp.status = 206;
+        rsp.set_header("Content-Type", "application/octet-stream");
+        std::cerr << "file range " << range_val;
+        std::cerr << " download success" << std::endl;
+      }
+    }
+    static bool RangeParse(std::string &range_val, int64_t &start, int64_t &len){
+      // Range: bytes = start-end;
+      size_t pos1 = range_val.find("=");
+      size_t pos2 = range_val.find("-");
+      if(pos1 == std::string::npos || pos2 == std::string::npos){
+        std::cerr << "range " << range_val << " format error" << std::endl;
+        return false;
+      }
+      int64_t end;
+      std::string rstart = range_val.substr(pos1 + 1, pos2 - pos1 -1);
+      std::string rend = range_val.substr(pos2 + 1);
+      std::stringstream tmp;
+      tmp << rstart;
+      tmp >> start;
+      tmp.clear();
+      tmp << rend;
+      tmp >> end;
+      len = end - start + 1;
+      return true;
     }
   public:
     P2PServer(){

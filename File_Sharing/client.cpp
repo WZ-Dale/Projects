@@ -36,11 +36,11 @@ class P2PClient
         struct sockaddr_in* ip = (struct sockaddr_in*)addrs->ifa_addr;
         struct sockaddr_in* mask = (struct sockaddr_in*)addrs->ifa_netmask;
         if(ip->sin_family != AF_INET){
-          addrs = addrs->ifa_next;
+          //addrs = addrs->ifa_next;
           continue;
         }
         if(ip->sin_addr.s_addr == inet_addr("127.0.0.1")){
-          addrs = addrs->ifa_next;
+          //addrs = addrs->ifa_next;
           continue;
         }
         uint32_t net = ntohl(ip->sin_addr.s_addr & mask->sin_addr.s_addr);
@@ -56,12 +56,12 @@ class P2PClient
     }
     void HostPair(std::string &i){
       Client client(i.c_str(), _srv_port); 
-      auto rsp =  client.Get("/hostpair");
+      auto rsp = client.Get("/hostpair");
       if(rsp && rsp->status == 200){
         std::cerr << "host " << i << " pair success" << std::endl;
         _online_list.push_back(i);
       }
-      //std::cerr << "host " << i << " pair failed" << std::endl;
+      std::cerr << "host " << i << " pair failed" << std::endl;
       //fprintf(stderr, "%s\n", i.c_str());
       return;
     }
@@ -81,9 +81,11 @@ class P2PClient
       for(int i = 0; i < _online_list.size(); ++i){
         std::cout << i << ". " << _online_list[i] << std::endl;
       }
+      std::cout << "==============================" << std::endl;
       std::cout << "Please choose: ";
       fflush(stdout);
       std::cin >> _host_idx;
+      std::cout << "------------------------------" << std::endl;
       if(_host_idx < 0 || _host_idx > _online_list.size()){
         _host_idx = -1;
         std::cerr << "choose error" << std::endl;
@@ -103,9 +105,11 @@ class P2PClient
       for(int i = 0; i < _file_list.size(); ++i){
         std::cout << i << ". " << _file_list[i] << std::endl;
       }
+      std::cout << "==============================" << std::endl;
       std::cout << "Please choose: ";
       fflush(stdout);
       std::cin >> _file_idx;
+      std::cout << "------------------------------" << std::endl;
       if(_file_idx < 0 || _file_idx > _file_list.size()){
         _file_idx = -1;
         std::cerr << "choose error" << std::endl;
@@ -119,12 +123,14 @@ class P2PClient
       std::string realpath = "Download/" + name;
       std::stringstream range_val;
       range_val << "bytes=" << start << "-" << end;
+      std::cerr << "download range；" << range_val.str() << std::endl;
       *res = false;
       Client client(host.c_str(), _srv_port);
       // Range: bytes = start-end;
       Headers header;
       header.insert(std::make_pair("Range", range_val.str().c_str()));
       auto rsp = client.Get(uri.c_str(), header);
+      //std::cout << rsp->status << std::endl;
       if(rsp && rsp->status == 206){
         std::ofstream file(realpath, std::ios::binary);
         if(!file.is_open()){
@@ -140,8 +146,12 @@ class P2PClient
         }
         file.close();
         *res = true;
-        std::cerr << "file " << realpath << " download range: ";
+        std::cerr << realpath << " download range: ";
         std::cerr << range_val.str() << " success" << std::endl;
+      }
+      else{
+        std::cerr << realpath << " download range: ";
+        std::cerr << range_val.str() << " falied" << std::endl;
       }
       return;
     }
@@ -175,20 +185,21 @@ class P2PClient
         return false;
       }
       int count = fsize / RANGE_SIZE;
+      std::cerr << "file size: " << fsize << std::endl;
+      std::cerr << "range count: " << count << std::endl;
       std::vector<boost::thread> thr_list(count + 1);
       std::vector<bool> res_list(count + 1);
       for(int i = 0; i <= count; ++i){
         int64_t start, end, rlen;
         start = i * RANGE_SIZE;
-        if(i != count){ // 不是最后一块
-          end = start + RANGE_SIZE - 1;
-        }
-        else{ // 是最后一块
+        end = start + RANGE_SIZE - 1;
+        if(i == count){ // 是最后一块
           if(fsize % RANGE_SIZE == 0){ //最后一块为0
             break;
           }
           end = fsize - 1;  // 最后一块不满
         }
+        std::cerr << "range: " << start << "-" << end << std::endl;
         rlen = end - start + 1;
         // Range: bytes = start-end;
         bool res;
@@ -198,7 +209,7 @@ class P2PClient
       }
       bool ret = true;
       for(int i = 0; i <= count; ++i){
-        if(i == count && fsize % RANGE_SIZE == 0){
+        if(i == count && fsize % RANGE_SIZE == 0){ // 没有最后一个分块
           break;
         } 
         thr_list[i].join();
@@ -208,12 +219,12 @@ class P2PClient
       }
       if(ret == true){
         std::cerr << "download file " << name << " success" << std::endl;
-        return true;
       }
       else{
         std::cerr << "download file " << name << " failed" << std::endl;
         return false;
       }
+      return true;
     }
     int DoFile(){
       std::cout << "##################################################" << std::endl;
@@ -222,9 +233,11 @@ class P2PClient
       std::cout << "3. 显示在线列表" << std::endl;
       std::cout << "0. 退出" << std::endl;
       int choose;
+      std::cout << "==============================" << std::endl;
       std::cout << "Please choose: ";
       fflush(stdout);
       std::cin >> choose;
+      std::cout << "------------------------------" << std::endl;
       return choose;
     }
   public:
