@@ -77,6 +77,9 @@ class P2PServer
           rsp.status = 400;
           return;
         }
+        std::cerr << "range: " << range_val << std::endl;
+        std::cerr << "body.resize: " << rlen << std::endl;
+        rsp.body.resize(rlen);
         std::ifstream file(name.str(), std::ios::binary); 
         if(!file.is_open()){
           std::cerr << "openfile " << name.str() << " failed!" << std::endl;
@@ -84,7 +87,6 @@ class P2PServer
           return;
         }
         file.seekg(start, std::ios::beg); // 指定位置读
-        rsp.body.resize(rlen);
         file.read(&rsp.body[0], rlen);
         if(!file.good()){
           std::cerr << "read file " << name.str() << " body error!" << std::endl;

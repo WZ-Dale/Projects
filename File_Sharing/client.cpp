@@ -5,6 +5,8 @@
 #include <thread>
 #include <stdio.h>
 #include <ifaddrs.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <boost/filesystem.hpp>
@@ -132,19 +134,19 @@ class P2PClient
       auto rsp = client.Get(uri.c_str(), header);
       //std::cout << rsp->status << std::endl;
       if(rsp && rsp->status == 206){
-        std::ofstream file(realpath, std::ios::binary);
-        if(!file.is_open()){
+        int fd = open(realpath.c_str(), O_CREAT | O_WRONLY, 0664); // 创建和写入，并给权限
+        if(fd < 0){
           std::cerr << "file " << realpath << " open error" << std::endl;
           return;
         }
-        file.seekp(start, std::ios::beg); // 跳转到指定位置
-        file.write(&rsp->body[0], rsp->body.size());
-        if(!file.good()){
+        lseek(fd, start, SEEK_SET); // 跳转到指定位置
+        int ret = write(fd, &rsp->body[0], rsp->body.size());
+        if(ret < 0){
           std::cerr << "file " << realpath << " write error" << std::endl;
-          file.close();
+          close(fd);
           return;
         }
-        file.close();
+        close(fd);
         *res = true;
         std::cerr << realpath << " download range: ";
         std::cerr << range_val.str() << " success" << std::endl;
@@ -189,7 +191,7 @@ class P2PClient
       std::cerr << "range count: " << count << std::endl;
       std::vector<boost::thread> thr_list(count + 1);
       std::vector<bool> res_list(count + 1);
-      for(int i = 0; i <= count; ++i){
+      for(int64_t i = 0; i <= count; ++i){
         int64_t start, end, rlen;
         start = i * RANGE_SIZE;
         end = start + RANGE_SIZE - 1;
@@ -207,7 +209,7 @@ class P2PClient
         thr_list[i] = std::move(thr);
         res_list[i] = std::move(res);
       }
-      bool ret = true;
+	  bool ret = true;
       for(int i = 0; i <= count; ++i){
         if(i == count && fsize % RANGE_SIZE == 0){ // 没有最后一个分块
           break;
