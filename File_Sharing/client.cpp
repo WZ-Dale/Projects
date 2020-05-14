@@ -191,6 +191,7 @@ class P2PClient
       std::cerr << "range count: " << count << std::endl;
       std::vector<boost::thread> thr_list(count + 1);
       std::vector<bool> res_list(count + 1);
+      bool ret = true;
       for(int64_t i = 0; i <= count; ++i){
         int64_t start, end, rlen;
         start = i * RANGE_SIZE;
@@ -206,10 +207,14 @@ class P2PClient
         // Range: bytes = start-end;
         bool res;
         boost::thread thr(&P2PClient::RangeDownload, this, host, name, start, end, &res);
-        thr_list[i] = std::move(thr);
-        res_list[i] = std::move(res);
+        //thr_list[i] = std::move(thr);
+        //res_list[i] = std::move(res);
+        thr.join();
+        if(res == false){
+          ret = false;
+        }
       }
-	  bool ret = true;
+      /*
       for(int i = 0; i <= count; ++i){
         if(i == count && fsize % RANGE_SIZE == 0){ // 没有最后一个分块
           break;
@@ -219,6 +224,7 @@ class P2PClient
           ret = false;
         }
       }
+      */
       if(ret == true){
         std::cerr << "download file " << name << " success" << std::endl;
       }
