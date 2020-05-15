@@ -120,13 +120,13 @@ class P2PClient
       name = _file_list[_file_idx];
       return true;
     }
-    void RangeDownload(std::string host, std::string name, int64_t start, int64_t end, bool *res){
+    void RangeDownload(std::string host, std::string name, int64_t start, int64_t end, int *res){
       std::string uri = "/list/" + name;
       std::string realpath = "Download/" + name;
       std::stringstream range_val;
       range_val << "bytes=" << start << "-" << end;
       std::cerr << "download range；" << range_val.str() << std::endl;
-      *res = false;
+      *res = 0;
       Client client(host.c_str(), _srv_port);
       // Range: bytes = start-end;
       Headers header;
@@ -147,7 +147,7 @@ class P2PClient
           return;
         }
         close(fd);
-        *res = true;
+        *res = 1;
         std::cerr << realpath << " download range: ";
         std::cerr << range_val.str() << " success" << std::endl;
       }
@@ -190,7 +190,7 @@ class P2PClient
       std::cerr << "file size: " << fsize << std::endl;
       std::cerr << "range count: " << count << std::endl;
       std::vector<boost::thread> thr_list(count + 1);
-      std::vector<bool> res_list(count + 1);
+      std::vector<int> res_list(count + 1);
       bool ret = true;
       for(int64_t i = 0; i <= count; ++i){
         int64_t start, end, rlen;
@@ -205,26 +205,25 @@ class P2PClient
         std::cerr << "range: " << start << "-" << end << std::endl;
         rlen = end - start + 1;
         // Range: bytes = start-end;
-        bool res;
-        boost::thread thr(&P2PClient::RangeDownload, this, host, name, start, end, &res);
-        //thr_list[i] = std::move(thr);
+        int* res = &res_list[i];
+        boost::thread thr(&P2PClient::RangeDownload, this, host, name, start, end, res);
+        thr_list[i] = std::move(thr);
         //res_list[i] = std::move(res);
-        thr.join();
-        if(res == false){
-          ret = false;
-        }
+        //thr.join();
+        //if(res == false){
+        //  ret = false;
+        //}
       }
-      /*
       for(int i = 0; i <= count; ++i){
         if(i == count && fsize % RANGE_SIZE == 0){ // 没有最后一个分块
           break;
         } 
         thr_list[i].join();
-        if(res_list[i] == false){
+        if(res_list[i] == 0){
+          std::cerr << "range " << i << " download falied" << std::endl; 
           ret = false;
         }
       }
-      */
       if(ret == true){
         std::cerr << "download file " << name << " success" << std::endl;
       }
