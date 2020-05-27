@@ -1,0 +1,2 @@
+energy_average  entropy_average  contrast_average  idMoment_average
+0.198143  7.94877  3.30057  1.88961
