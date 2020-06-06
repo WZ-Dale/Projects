@@ -26,39 +26,25 @@
 using namespace httplib;
 namespace bf = boost::filesystem;
 
-class P2PClient
+#include <QObject>
+#include <QString>
+
+class P2PClient : public QObject
 {
+    Q_OBJECT
+//public:
+//    P2PClient(uint16_t port);
+//    bool Start();
+
 public:
-    P2PClient(uint16_t port):_srv_port(port){}
-    bool Start(){
-        while(1){
-            std::vector<std::string> list;
-            std::string filename;
-            int choose = DoFile();
-            switch(choose){
-                case 1:
-                    GetAllHost(list);
-                    GetOnlineHost(list);
-                    break;
-                case 2:
-                    if(!ShowOnlineHost()){
-                        break;
-                    }
-                    GetFileList();
-                    break;
-                case 3:
-                    if(!ShowFileList(filename)){
-                        break;
-                    }
-                    DownloadFile(filename);
-                    break;
-                case 0:
-                    exit(0);
-                default:
-                    break;
-            }
-        }
-    }
+    explicit P2PClient(uint16_t port, QObject *parent = 0);
+    bool Start();
+
+signals:
+    void client_emit(QString);
+private slots:
+    void client_read(int a);
+
 private:
     /* 这里所说的主机在局域网中是被请求的，则相当于服务器端 */
     /* 获取局域网中所有主机地址 */
@@ -87,6 +73,9 @@ private:
     int _file_idx;
     std::vector<std::string> _online_list;
     std::vector<std::string> _file_list;
+
+    QString _str;
+    int _choose = 1;
 };
 
 

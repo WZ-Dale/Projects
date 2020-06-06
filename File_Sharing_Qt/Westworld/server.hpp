@@ -18,19 +18,8 @@ namespace bf = boost::filesystem;
 class P2PServer
 {
 public:
-    P2PServer(){
-        // 判断共享目录是否存在，若不存在则创建
-        if(!bf::exists(SHAREDFILE)){
-        bf::create_directory(SHAREDFILE);
-        }
-    }
-    bool Start(uint16_t port){
-        _server.Get("/hostpair", GetHostPair);
-        _server.Get("/list", GetFileList);
-        _server.Get("/list/(.*)", GetFileData);
-        _server.listen("0.0.0.0", port);
-        return true;
-    }
+    P2PServer();
+    bool Start(uint16_t port);
 private:
     /* httplib库中会将请求信息放入req对象中，并将响应信息放入rsp中 */
     /* 响应配对请求 */

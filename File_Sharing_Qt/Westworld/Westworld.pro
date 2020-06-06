@@ -27,15 +27,13 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     server.cpp \
-    client.cpp \
-    thread.cpp
+    client.cpp
 
 HEADERS += \
         mainwindow.h \
     httplib.h \
     server.hpp \
-    client.hpp \
-    thread.h
+    client.hpp
 
 FORMS += \
         mainwindow.ui
