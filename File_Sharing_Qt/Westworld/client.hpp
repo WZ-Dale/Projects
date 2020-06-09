@@ -75,7 +75,7 @@ private:
     std::vector<std::string> _file_list;
 
     QString _str;
-    int _choose = 1;
+    int _choose = -1;
 };
 
 

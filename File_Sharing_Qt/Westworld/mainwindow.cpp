@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QThread0->start();
     QThread1->start();
 
+    connect(&server,SIGNAL(server_emit(QString)),this,SLOT(UI_read(QString)));
     connect(&client,SIGNAL(client_emit(QString)),this,SLOT(UI_read(QString)));
     //connect(&client,SIGNAL(server_emit(int,QString)),this,SLOT(UI_read(int,QString)));
     connect(this,SIGNAL(UI_emit(int)),&client,SLOT(client_read(int)));
@@ -46,7 +47,7 @@ void MainWindow::UI_read(QString b)
     //将发送过来的参数，int型转成QString型，传入控件
 //    QString aa = QString::number(a, 10);
 //    ui->lineEdit->setText(aa);
-    ui->textBrowser->setText(b);
+    ui->textBrowser->append(b);
 }
 
 void MainWindow::on_pushButton_OK_clicked()
@@ -80,4 +81,9 @@ void Thread::cli_start()
     qDebug()<<"子线程cli_start函数ID:"<<QThread::currentThreadId();
     //P2PClient client(9000);
     client.Start();
+}
+
+void MainWindow::on_textBrowser_textChanged()
+{
+    ui->textBrowser->moveCursor(QTextCursor::End);
 }

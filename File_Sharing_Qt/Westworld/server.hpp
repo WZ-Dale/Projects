@@ -15,11 +15,20 @@ namespace bf = boost::filesystem;
 #define SHAREDFILE "Shared"
 #define LOG(fmt, ...) fprintf(stderr, fmt, __VA_ARGS__)
 
-class P2PServer
+#include <QObject>
+#include <QString>
+
+class P2PServer : public QObject
 {
+    Q_OBJECT
+//public:
+//    P2PServer();
+//    bool Start(uint16_t port);
 public:
-    P2PServer();
+    explicit P2PServer(QObject *parent = 0);
     bool Start(uint16_t port);
+signals:
+    void server_emit(QString);
 private:
     /* httplib库中会将请求信息放入req对象中，并将响应信息放入rsp中 */
     /* 响应配对请求 */
@@ -32,6 +41,8 @@ private:
     static bool RangeParse(std::string &range_val, int64_t &start, int64_t &len);
 private:
     Server _server;
+
+    QString _str;
 };
 
 

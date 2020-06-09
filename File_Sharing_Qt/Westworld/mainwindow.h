@@ -31,6 +31,8 @@ private slots:
     void UI_read(QString b);
     void on_pushButton_OK_clicked();
 
+    void on_textBrowser_textChanged();
+
 private:
     Ui::MainWindow *ui;
 
