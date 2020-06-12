@@ -354,26 +354,30 @@ if __name__ == '__main__':
 
     # 父进程创建Queue，并传给各个子进程
     # parent_conn, child_conn = Pipe()
-    queue_camera_bm = Queue(3)  # 进程通讯
-    bm_data = Queue(3)  # 进程通讯
-    queue_camera_full = Queue(3)  # 进程通讯
-    queue_camera_show = Queue(3)  # 进程通讯
-    Object_data = Queue(3)  # 进程通讯
+    queue_camera_bm = Queue(3)      # 进程通讯
+    bm_data = Queue(3)              # 进程通讯
+    queue_camera_full = Queue(3)    # 进程通讯
+    queue_camera_show = Queue(3)    # 进程通讯
+    Object_data = Queue(3)          # 进程通讯
 
-    #摄像头获取(sgbm专用，人员检测)
+    # 线程1 -- 摄像头获取(sgbm专用，人员检测)
     rc = Process(target=read_camera, args=(queue_camera_bm, queue_camera_full,queue_camera_show,))
     rc.start()
 
+    # 线程2 -- 
     bm = Process(target=BM, args=(queue_camera_bm, bm_data,))
     bm.start()
 
+    # 线程3 -- 目标检测
     obde = Process(target=ObjectDetection, args=(queue_camera_full, Object_data,))
     obde.start()
 
+    # 线程4 -- 显示 原始图像 距离信息 人员信息
     show = Process(target=showImg, args=(queue_camera_show, bm_data, Object_data,))
     show.start()
 
     while True:
-        if cv2.waitKey(100) & 0xFF == ord('q'):
+        # 进行按键‘q’的检测
+        if cv2.waitKey(100)&0xFF == ord('q'):
             break
         #time.sleep(0.5)
