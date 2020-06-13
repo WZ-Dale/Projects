@@ -25,20 +25,24 @@ def CPUtest():
 # adding code-行人检测-判断目标及加矩形窗 @NXT
 # 如果矩形被完全包含在另外一个矩形中，可确定该矩形应该被丢弃
 def is_inside(o, i):
-    ox, oy, ow, oh = o
-    ix, iy, iw, ih = i
+    ox, oy, ow, oh = o  # 小（被包含）
+    ix, iy, iw, ih = i  # 大（包含）
+    # 大包含小的话返回true
     return ox > ix and oy > iy and ox + ow < ix + iw and oy + oh < iy + ih
 
+# 以person为起点画矩形框
 def draw_person(image, person):
     x, y, w, h = person
-    # cv2.rectangle(img, (x, y), (x+w, y+h), (0,255,255), 2)
+    # cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 255), 2)
+    # 参数：（原图，矩阵的左上点坐标，矩阵的右下点坐标，画线对应的rgb颜色，所画的线的宽度）
     cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 255), 2)
 
-# 读摄像头并显示的代码:
+# 读取摄像头并显示
 def read_camera(queue_camera_bm, queue_camera_full,queue_camera_show):
     # 开启摄像头
     camera1 = cv2.VideoCapture(1)
     camera2 = cv2.VideoCapture(0)
+    # 3 -- 设置帧宽度；4 -- 设置帧高度。
     camera1.set(3, 640)  # 设置分辨率
     camera1.set(4, 360)
     camera2.set(3, 640)  # 设置分辨率
@@ -52,7 +56,7 @@ def read_camera(queue_camera_bm, queue_camera_full,queue_camera_show):
     #start = time.clock()
     while True:
         pickOneOfTwo = pickOneOfTwo + 1
-        if pickOneOfTwo  >= 2:
+        if pickOneOfTwo >= 2:
             pickOneOfTwo = 0
         #if not pickOneOfTwo:    #间隔测速
         #    end = time.clock()
@@ -75,12 +79,15 @@ def read_camera(queue_camera_bm, queue_camera_full,queue_camera_show):
             time.sleep(0.03)
             continue
         if ret1 and ret2:
+            # 截取图像
             CutImg1 = Left[60:180, 50:590]  # y x
             CutImg2 = Right[60:180, 50:590]  # y x
             # cv2.imshow("left", CutImg1)
             # cv2.imshow("right", frame2)
+            # 转灰度图像
             CutImg1 = cv2.cvtColor(CutImg1, cv2.COLOR_BGR2GRAY)
             CutImg2 = cv2.cvtColor(CutImg2, cv2.COLOR_BGR2GRAY)
+            # 简单映射
             imgL = cv2.remap(CutImg1, camera_configs.left_map1, camera_configs.left_map2, cv2.INTER_LINEAR)
             imgR = cv2.remap(CutImg2, camera_configs.right_map1, camera_configs.right_map2, cv2.INTER_LINEAR)
         else:
@@ -92,9 +99,11 @@ def read_camera(queue_camera_bm, queue_camera_full,queue_camera_show):
         cp.imgR = imgR
 
         try:    #to BM
+            # 队列为空，取值的时候不等待，但是取不到值那么直接崩溃了
             clear = queue_camera_bm.get_nowait()
         except:
             pass
+        # 放入数据
         queue_camera_bm.put(cp)
 
         try:    #to ObjectDetection
@@ -134,8 +143,8 @@ def showImg(queue_camera_show, bm_data, Object_data):
 
     #BG = cv2.imread("/home/pi/Desktop/BirdVision/BG.bmp")#树莓派目录
     BG = cv2.imread('./BG.jpg')#PC目录
-    zeroimg = np.zeros((360,640,3), dtype=np.uint8)
-    DeepData  = np.zeros((42), dtype=np.uint16)
+    zeroimg = np.zeros((360,640,3), dtype=np.uint8)#图像3层
+    DeepData  = np.zeros((42), dtype=np.uint16)#景深数据
     show_img = zeroimg.copy()
     Deepimg = zeroimg.copy()
     personImg = zeroimg.copy()
@@ -151,7 +160,7 @@ def showImg(queue_camera_show, bm_data, Object_data):
             pass
 
         original_img = cv2.flip(src=original_img,flipCode=1)#镜像旋转
-        show_img = cv2.addWeighted(original_img, 1,objectImg, 1, 0) 
+        show_img = cv2.addWeighted(original_img, 1, objectImg, 1, 0) 
         cv2.imshow("SHOW", show_img)
         cv2.waitKey(10)
 
@@ -354,25 +363,26 @@ if __name__ == '__main__':
 
     # 父进程创建Queue，并传给各个子进程
     # parent_conn, child_conn = Pipe()
+    # 创建消息队列，3： 表示消息队列最大个数
     queue_camera_bm = Queue(3)      # 进程通讯
     bm_data = Queue(3)              # 进程通讯
     queue_camera_full = Queue(3)    # 进程通讯
     queue_camera_show = Queue(3)    # 进程通讯
     Object_data = Queue(3)          # 进程通讯
 
-    # 线程1 -- 摄像头获取(sgbm专用，人员检测)
+    # 进程1 -- 摄像头获取(sgbm专用，人员检测)
     rc = Process(target=read_camera, args=(queue_camera_bm, queue_camera_full,queue_camera_show,))
     rc.start()
 
-    # 线程2 -- 
+    # 进程2 -- 
     bm = Process(target=BM, args=(queue_camera_bm, bm_data,))
     bm.start()
 
-    # 线程3 -- 目标检测
+    # 进程3 -- 目标检测
     obde = Process(target=ObjectDetection, args=(queue_camera_full, Object_data,))
     obde.start()
 
-    # 线程4 -- 显示 原始图像 距离信息 人员信息
+    # 进程4 -- 显示 原始图像 距离信息 人员信息
     show = Process(target=showImg, args=(queue_camera_show, bm_data, Object_data,))
     show.start()
 
