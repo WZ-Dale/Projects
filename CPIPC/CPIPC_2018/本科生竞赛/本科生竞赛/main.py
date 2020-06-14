@@ -228,6 +228,7 @@ def showImg(queue_camera_show, bm_data, Object_data):
         if person_sige or Deep_sige:
             objectImg = cv2.addWeighted(personImg, 1, Deepimg, 1, 0)
 
+# æ∞…Óº∆À„
 def BM(queue_camera_bm, bm_data):
     num = 4
     blockSize = 10
