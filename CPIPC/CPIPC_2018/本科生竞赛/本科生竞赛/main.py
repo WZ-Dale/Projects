@@ -14,7 +14,7 @@ class itemImg:
         self.DeepData = np.empty(shape=[0, 2])
 
 # CPU压力测试
-class CP:
+class CP:################################################################################################
     pass
 
 def CPUtest():
@@ -73,7 +73,7 @@ def read_camera(queue_camera_bm, queue_camera_full,queue_camera_show):
             ret2, Right = camera1.read()
         ##Left = cv2.imread('D:/Left_15.jpg')
         ##Right = cv2.imread('D:/Right_15.jpg')
-        if pickOneOfTwo == 0:    #差值取图像
+        if pickOneOfTwo == 0:    #差值取图像################################################################################################
             pass
         else:
             time.sleep(0.03)
@@ -135,7 +135,7 @@ def showImg(queue_camera_show, bm_data, Object_data):
     #cv2.namedWindow("SHOW", 0);
     cv2.resizeWindow("SHOW", 1280, 720);
     cv2.moveWindow("SHOW",620,20);
-    #Depth data processing parameters 深度数据处理参数
+    #Depth data processing parameters 深度数据处理参数################################################################################################
     DDPP = [
         [0,10,0,7,0],[3,17,4,11,7],[10,24,4,11,14],
         [17,31,4,11,21],[24,39,4,11,28],[31,42,4,11,35]
@@ -143,8 +143,8 @@ def showImg(queue_camera_show, bm_data, Object_data):
 
     #BG = cv2.imread("/home/pi/Desktop/BirdVision/BG.bmp")#树莓派目录
     BG = cv2.imread('./BG.jpg')#PC目录
-    zeroimg = np.zeros((360,640,3), dtype=np.uint8)#图像3层
-    DeepData  = np.zeros((42), dtype=np.uint16)#景深数据
+    zeroimg = np.zeros((360,640,3), dtype=np.uint8)#图像3层################################################################################################
+    DeepData  = np.zeros((42), dtype=np.uint16)#景深数据################################################################################################
     show_img = zeroimg.copy()
     Deepimg = zeroimg.copy()
     personImg = zeroimg.copy()
@@ -160,7 +160,7 @@ def showImg(queue_camera_show, bm_data, Object_data):
             pass
 
         original_img = cv2.flip(src=original_img,flipCode=1)#镜像旋转
-        show_img = cv2.addWeighted(original_img, 1, objectImg, 1, 0) 
+        show_img = cv2.addWeighted(original_img, 1, objectImg, 1, 0)#原图和目标检测（框选和深度信息）的叠加
         cv2.imshow("SHOW", show_img)
         cv2.waitKey(10)
 
@@ -180,17 +180,17 @@ def showImg(queue_camera_show, bm_data, Object_data):
             pass
        
         if person_sige:    #行人识别标记
-            personImg = BG.copy()    #清空图像
+            personImg = BG.copy()    #清空图像，只有倒车线
             #draw_person(personImg, (110,70,420,110))    #显示测距区域
             for person in found_filtered:
                 x1, y1, w1, h1 = person
                 #draw_person(personImg,(int(x1+w1/4), int(y1+h1*2/15), int(w1/2), int(h1*11/15)))
-                draw_person(personImg,(int(640-x1-w1*3/4), int(y1+h1*2/15), int(w1/2), int(h1*11/15)))#镜像旋转
+                draw_person(personImg,(int(640-x1-w1*3/4), int(y1+h1*2/15), int(w1/2), int(h1*11/15)))#镜像旋转，画矩形框
                 #draw_person(personImg, person)
                 #x1, y1, w1, h1 = person  # python 中数组怎么表示。输出的是检测小的区域的矩形顶点坐标，（没有输出检测到人的坐标）
          
         if Deep_sige:
-            Deepimg = zeroimg.copy()    #清空图像
+            Deepimg = zeroimg.copy()    #清空图像，即将距离信息清除
             #deepmax = Deepimg.min() + 200
             for i in range(6):
                 Parameter = DDPP[i]
@@ -226,7 +226,8 @@ def showImg(queue_camera_show, bm_data, Object_data):
                 #print(cutData)
 
         if person_sige or Deep_sige:
-            objectImg = cv2.addWeighted(personImg, 1, Deepimg, 1, 0)
+            objectImg = cv2.addWeighted(personImg, 1, Deepimg, 1, 0)#框选和深度信息的叠加
+
 
 # 景深计算
 def BM(queue_camera_bm, bm_data):
@@ -366,10 +367,10 @@ if __name__ == '__main__':
     # parent_conn, child_conn = Pipe()
     # 创建消息队列，3： 表示消息队列最大个数
     queue_camera_bm = Queue(3)      # 进程通讯
-    bm_data = Queue(3)              # 进程通讯
+    bm_data = Queue(3)              # 进程通讯  #景深信息
     queue_camera_full = Queue(3)    # 进程通讯
     queue_camera_show = Queue(3)    # 进程通讯
-    Object_data = Queue(3)          # 进程通讯
+    Object_data = Queue(3)          # 进程通讯  #目标坐标信息
 
     # 进程1 -- 摄像头获取(sgbm专用，人员检测)
     rc = Process(target=read_camera, args=(queue_camera_bm, queue_camera_full,queue_camera_show,))
