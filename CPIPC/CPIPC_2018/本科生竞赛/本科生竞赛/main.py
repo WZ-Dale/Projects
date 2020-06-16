@@ -14,7 +14,7 @@ class itemImg:
         self.DeepData = np.empty(shape=[0, 2])
 
 # CPU压力测试
-class CP:################################################################################################
+class CP:#######################################表示没看懂##################################################
     pass
 
 def CPUtest():
@@ -195,21 +195,21 @@ def showImg(queue_camera_show, bm_data, Object_data):
             for i in range(6):
                 Parameter = DDPP[i]
                 #print(Parameter)
-                cutData = DeepData[Parameter[0]:Parameter[1]]
+                cutData = DeepData[Parameter[0]:Parameter[1]]################################################################################################
                 deepmin = cutData.min()
                 if deepmin < 1400:
                     #print(deepmin)
-                    cutData = cutData[Parameter[2]:Parameter[3]]
+                    cutData = cutData[Parameter[2]:Parameter[3]]################################################################################################
                     #print(cutData)
                     #print(cutData.tolist().index(deepmin))
                     tryResult = False
                     try:
-                        aims = cutData.tolist().index(deepmin)
+                        aims = cutData.tolist().index(deepmin)################################################################################################
                         tryResult = True
                     except:
                         pass
                     if tryResult:
-                        aims = aims+Parameter[4]
+                        aims = aims+Parameter[4]################################################################################################
                         #print(aims)
                         #x_num = int(aims*10+80)
                         x_num = int(485 - aims*10)#镜像坐标 640 - 原坐标
@@ -221,7 +221,8 @@ def showImg(queue_camera_show, bm_data, Object_data):
                             colorTest = (0, 255, 0)
                         else:    #5米外亮蓝色
                             colorTest = (255, 255, 0)
-                        cv2.putText(Deepimg, "%.1fM" % (showmin),(x_num, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, colorTest, 3)
+                        cv2.putText(Deepimg, "%.1fM" % (showmin),(x_num, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, colorTest, 3)#添加深度信息到图像
+                        #各参数依次是：图片，添加的文字，左上角坐标，字体，字体大小，颜色，字体粗细
                     #cv2.waitKey(0)
                 #print(cutData)
 
@@ -236,7 +237,7 @@ def BM(queue_camera_bm, bm_data):
     speckleWindowSize = 100
     # 顺序矩阵 新加入的 存0号位置
     # cut_data_array = np.zeros((462*4,3), dtype=np.int32)
-    cut_data_array = np.zeros((924, 3), dtype=np.int16)
+    cut_data_array = np.zeros((924, 3), dtype=np.int16)################################################################################################
     ##cv2.namedWindow("cut img", 0);
     #cv2.resizeWindow("cut img", 420, 110);
     ##cv2.moveWindow("cut img",10,20);
@@ -262,30 +263,34 @@ def BM(queue_camera_bm, bm_data):
             continue
         imgL = cp.imgL
         imgR = cp.imgR
-        stereo = cv2.StereoBM_create(64, 11)
+        stereo = cv2.StereoBM_create(64, 11)################################################################################################
         #stereo = cv2.StereoSGBM_create(0, 16 * num, blockSize, 0, 0, -10, 31, 20, speckleWindowSize, 32, 0)
-        disparity = stereo.compute(imgL, imgR)
-        disp = cv2.normalize(disparity, disparity, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+        #stereo = cv2.StereoBM_create(numDisparities=16, blockSize=11)
+        #numDisparities：即最大视差值与最小视差值之差, 窗口大小必须是16的整数倍，int 型
+        #blockSize：匹配的块大小。它必须是> = 1的奇数。通常情况下，它应该在3--11的范围内。这里设置为大于11也可以，但必须为奇数。
+        disparity = stereo.compute(imgL, imgR)#求视差
+        disp = cv2.normalize(disparity, disparity, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)#归一化
         ##cv2.imshow("cut img",imgL)
         ##cv2.imshow("BM",disp)
         # 将图片扩展至3d空间中，其z方向的值则为当前的距离
         threeD = cv2.reprojectImageTo3D(disparity.astype(np.float32) / 16., camera_configs.Q)
+        #该函数将视差图，通过投影矩阵Q，得到一副映射图，图像大小与视差图相同，且每个像素具有三个通道，分别存储了该像素位置在相机坐标系下的三维点坐标在x, y, z,三个轴上的值，即每个像素的在相机坐标系下的三维坐标。
 
         # 距离数据切片  6/10  shape 22/84 float32
-        cut_threeD = threeD[0:110:5, 60:480:10, 2]
+        cut_threeD = threeD[0:110:5, 60:480:10, 2]################################################################################################
         cut_threeD = cut_threeD / 10  # 精度为厘米
-        cut_threeD[cut_threeD > 1400] = 1400  # 最大匹配距离
-        cut_threeD[cut_threeD < 0] = 1500  # 无效值
+        cut_threeD[cut_threeD > 1400] = 1400  # 最大匹配距离################################################################################################
+        cut_threeD[cut_threeD < 0] = 1500  # 无效值################################################################################################
         cut_threeD = cut_threeD.astype(np.uint16)  # 取整，改变数据类型
-        cut_data = cut_threeD.reshape(924, 1)  # (462,1)  实时图像数据
+        cut_data = cut_threeD.reshape(924, 1)  # (462,1)  实时图像数据################################################################################################
 
         cut_data_show = cut_threeD.copy()  # 结果显示
-        cut_data_show = cut_data_show / 5.88
+        cut_data_show = cut_data_show / 5.88################################################################################################
         cut_data_show = cut_data_show.astype(np.uint8)
         ##cv2.imshow("Sampled at intervals", cut_data_show)
 
         cut_data_array = cut_data_array[:, 0:2]  # 剔除过期数据
-        cut_data_array = np.concatenate((cut_data, cut_data_array), axis=1)  # 引入最新图片
+        cut_data_array = np.concatenate((cut_data, cut_data_array), axis=1)  # 引入最新图片   # 数组拼接
         cut_data_sequence = cut_data_array.copy()  # 数据深拷贝
         cut_data_sequence.sort(axis=1)  # 数据排序
 
@@ -366,17 +371,17 @@ if __name__ == '__main__':
     # 父进程创建Queue，并传给各个子进程
     # parent_conn, child_conn = Pipe()
     # 创建消息队列，3： 表示消息队列最大个数
-    queue_camera_bm = Queue(3)      # 进程通讯
+    queue_camera_bm = Queue(3)      # 进程通讯  #用于深度处理的图像（左右相机）
     bm_data = Queue(3)              # 进程通讯  #景深信息
-    queue_camera_full = Queue(3)    # 进程通讯
-    queue_camera_show = Queue(3)    # 进程通讯
+    queue_camera_full = Queue(3)    # 进程通讯  #用于目标检测 （左相机）
+    queue_camera_show = Queue(3)    # 进程通讯  #原图         （左相机）
     Object_data = Queue(3)          # 进程通讯  #目标坐标信息
 
     # 进程1 -- 摄像头获取(sgbm专用，人员检测)
     rc = Process(target=read_camera, args=(queue_camera_bm, queue_camera_full,queue_camera_show,))
     rc.start()
 
-    # 进程2 -- 
+    # 进程2 -- 景深计算
     bm = Process(target=BM, args=(queue_camera_bm, bm_data,))
     bm.start()
 
