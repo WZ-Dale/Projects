@@ -34,7 +34,7 @@ void Test0() {
 int main(int argc, const char ** argv) {
 	//Test0();
 	//Test1();
-	//Test2();					// 提取胎冠图像
+	Test2();					// 提取胎冠图像
 
 	//for (int i = 1; i < 14; ++i) {
 	//	cv::String x = to_string(i);
@@ -48,7 +48,7 @@ int main(int argc, const char ** argv) {
 	//	Test3(str.c_str());			// 灰度共生矩阵（磨损）
 	//}
 
-	Test4(argc, argv);				// Radon变换
+	//Test4(argc, argv);				// Radon变换
 
 
 

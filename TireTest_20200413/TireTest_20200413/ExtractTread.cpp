@@ -318,4 +318,10 @@ void Test2() {
 
 // 保存胎冠图片
 	//cv::imwrite("T2.jpg", image_min);
+
+
+
+// 二值化
+	srcImage = image_min;
+	BarbinarizationFun(srcImage, dstImage);
 }
