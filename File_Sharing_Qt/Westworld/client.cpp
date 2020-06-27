@@ -129,3 +129,4 @@ int P2PClient::DoFile(){
     emit client_emit(_str);
     return _choose;
 }
+

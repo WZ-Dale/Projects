@@ -28,8 +28,7 @@ namespace bf = boost::filesystem;
 
 #include <QObject>
 #include <QString>
-
-class Thread1;
+#include <QThread>
 
 class P2PClient : public QObject
 {
@@ -78,19 +77,6 @@ private:
 
     QString _str;
     int _choose = -1;
-};
-
-/*****************************************************************/
-
-class Thread1 : public QObject
-{
-    Q_OBJECT
-public:
-    Thread1();
-    ~Thread1();
-public slots:
-    void srv_start();
-    void cli_start();
 };
 
 #endif // CLIRNT_HPP
