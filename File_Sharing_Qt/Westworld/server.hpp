@@ -16,19 +16,20 @@ namespace bf = boost::filesystem;
 #define LOG(fmt, ...) fprintf(stderr, fmt, __VA_ARGS__)
 
 #include <QObject>
+#include <QThread>
 #include <QString>
 
 class P2PServer : public QObject
 {
     Q_OBJECT
-//public:
-//    P2PServer();
-//    bool Start(uint16_t port);
 public:
     explicit P2PServer(QObject *parent = 0);
-    bool Start(uint16_t port);
 signals:
+    void complete();
     void server_emit(QString);
+public slots:
+    bool Start(uint16_t port);
+
 private:
     /* httplib库中会将请求信息放入req对象中，并将响应信息放入rsp中 */
     /* 响应配对请求 */

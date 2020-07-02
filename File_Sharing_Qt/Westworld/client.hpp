@@ -27,22 +27,19 @@ using namespace httplib;
 namespace bf = boost::filesystem;
 
 #include <QObject>
-#include <QString>
 #include <QThread>
+#include <QString>
 
 class P2PClient : public QObject
 {
     Q_OBJECT
-//public:
-//    P2PClient(uint16_t port);
-//    bool Start();
-
 public:
     explicit P2PClient(uint16_t port, QObject *parent = 0);
-    bool Start();
-
 signals:
+    void complete();
     void client_emit(QString);
+public slots:
+    bool Start();
 private slots:
     void client_read(int a);
 
@@ -78,5 +75,6 @@ private:
     QString _str;
     int _choose = -1;
 };
+
 
 #endif // CLIRNT_HPP
