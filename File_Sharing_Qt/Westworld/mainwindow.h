@@ -24,7 +24,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 signals:
-    void UI_emit(int a);
+    void UI_emit(int);
 private slots:
     void UI_read(QString b);
     void on_pushButton_OK_clicked();

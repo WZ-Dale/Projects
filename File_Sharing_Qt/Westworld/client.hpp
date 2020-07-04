@@ -38,9 +38,8 @@ public:
 signals:
     void complete();
     void client_emit(QString);
-public slots:
-    bool Start();
 private slots:
+    bool Start();
     void client_read(int a);
 
 private:

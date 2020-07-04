@@ -1,16 +1,16 @@
 #include "server.hpp"
 
-P2PServer::P2PServer(QObject *parent):QObject(parent){
+P2PServer::P2PServer(uint16_t port, QObject *parent):_srv_port(port), QObject(parent){
     // 判断共享目录是否存在，若不存在则创建
     if(!bf::exists(SHAREDFILE)){
-    bf::create_directory(SHAREDFILE);
+        bf::create_directory(SHAREDFILE);
     }
 }
-bool P2PServer::Start(uint16_t port){
+bool P2PServer::Start(){
     _server.Get("/hostpair", GetHostPair);
     _server.Get("/list", GetFileList);
     _server.Get("/list/(.*)", GetFileData);
-    _server.listen("0.0.0.0", port);
+    _server.listen("0.0.0.0", _srv_port);
     return true;
 }
 /* httplib库中会将请求信息放入req对象中，并将响应信息放入rsp中 */

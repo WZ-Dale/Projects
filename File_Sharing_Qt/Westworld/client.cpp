@@ -5,6 +5,7 @@ bool P2PClient::Start(){
     while(1){
         std::vector<std::string> list;
         std::string filename;
+        _choose = -1;
         int choose = DoFile();
         switch(choose){
             case 1:
@@ -34,7 +35,6 @@ bool P2PClient::Start(){
 
 void P2PClient::client_read(int a)
 {
-    //QString aa = QString::number(a, 10);
     _choose = a;
 }
 /* 这里所说的主机在局域网中是被请求的，则相当于服务器端 */
@@ -61,6 +61,7 @@ bool P2PClient::GetAllHost(std::vector<std::string> &list){
             list.push_back(inet_ntoa(ip));  // 将网络字节序的数字IP地址转换为点分十进制的字符串IP地址
         }
     }
+    std::cout << list.size() << std::endl;
     freeifaddrs(addrs);   // 释放网卡信息 存储资源
     return true;
 }
@@ -122,7 +123,7 @@ int P2PClient::DoFile(){
     while(_choose == -1){
         _str = "Please choose:\n";
         emit client_emit(_str);
-        sleep(3);
+        sleep(5);
     }
     _str = QString::number(_choose, 10);
     _str += "\n------------------------------\n";

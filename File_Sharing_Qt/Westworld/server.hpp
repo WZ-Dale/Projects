@@ -23,12 +23,12 @@ class P2PServer : public QObject
 {
     Q_OBJECT
 public:
-    explicit P2PServer(QObject *parent = 0);
+    explicit P2PServer(uint16_t port, QObject *parent = 0);
 signals:
     void complete();
     void server_emit(QString);
-public slots:
-    bool Start(uint16_t port);
+private slots:
+    bool Start();
 
 private:
     /* httplib库中会将请求信息放入req对象中，并将响应信息放入rsp中 */
@@ -42,6 +42,7 @@ private:
     static bool RangeParse(std::string &range_val, int64_t &start, int64_t &len);
 private:
     Server _server;
+    uint16_t _srv_port;
 
     QString _str;
 };

@@ -12,10 +12,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QThread* thread0 = new QThread();
     QThread* thread1 = new QThread();
-    P2PServer* server = new P2PServer();
+    P2PServer* server = new P2PServer(9000);
     P2PClient* client = new P2PClient(9000);
 
-    connect(thread0,SIGNAL(started()),server,SLOT(Start(9000)));
+    connect(thread0,SIGNAL(started()),server,SLOT(Start()));
     connect(server,SIGNAL(complete()),server,SLOT(deleteLater()));
     connect(server,SIGNAL(destroyed(QObject*)),thread0,SLOT(quit()));
     connect(thread0,SIGNAL(finished()),thread0,SLOT(deleteLater()));
@@ -25,14 +25,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(client,SIGNAL(destroyed(QObject*)),thread1,SLOT(quit()));
     connect(thread1,SIGNAL(finished()),thread1,SLOT(deleteLater()));
 
+    connect(server,SIGNAL(server_emit(QString)),this,SLOT(UI_read(QString)));
+    connect(client,SIGNAL(client_emit(QString)),this,SLOT(UI_read(QString)));
+    connect(this,SIGNAL(UI_emit(int)),client,SLOT(client_read(int)),Qt::DirectConnection);
+
     server->moveToThread(thread0);
     client->moveToThread(thread1);
     thread0->start();
     thread1->start();
-
-    connect(server,SIGNAL(server_emit(QString)),this,SLOT(UI_read(QString)));
-    connect(client,SIGNAL(client_emit(QString)),this,SLOT(UI_read(QString)));
-    connect(this,SIGNAL(UI_emit(int)),client,SLOT(client_read(int)));
 }
 
 MainWindow::~MainWindow()
@@ -52,7 +52,8 @@ void MainWindow::on_pushButton_OK_clicked()
 {
     QString str = ui->lineEdit->text();
     int choose = str.toInt();
-    UI_emit(choose);
+    emit UI_emit(choose);
+//    std::cout << choose << std::endl;
 }
 
 void MainWindow::on_textBrowser_textChanged()
