@@ -28,6 +28,7 @@ namespace bf = boost::filesystem;
 
 #include <QObject>
 #include <QThread>
+#include <QDebug>
 #include <QString>
 
 class P2PClient : public QObject

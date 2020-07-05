@@ -1,6 +1,8 @@
 #include "client.hpp"
 
-P2PClient::P2PClient(uint16_t port, QObject *parent):_srv_port(port), QObject(parent){}
+P2PClient::P2PClient(uint16_t port, QObject *parent):_srv_port(port), QObject(parent){
+    qDebug() << "client构造函数ID:" << QThread::currentThreadId();
+}
 bool P2PClient::Start(){
     while(1){
         std::vector<std::string> list;
@@ -61,7 +63,6 @@ bool P2PClient::GetAllHost(std::vector<std::string> &list){
             list.push_back(inet_ntoa(ip));  // 将网络字节序的数字IP地址转换为点分十进制的字符串IP地址
         }
     }
-    std::cout << list.size() << std::endl;
     freeifaddrs(addrs);   // 释放网卡信息 存储资源
     return true;
 }
@@ -83,6 +84,10 @@ void P2PClient::HostPair(std::string &i){
 }
 /* 获取在线主机列表（多线程配对），需要调用上面的函数HostPair */
 bool P2PClient::GetOnlineHost(std::vector<std::string> &list){
+    _str = "该主机所在的局域网中最多有 ";
+    _str += QString::number(list.size(), 10);
+    _str += " 台主机，开始配对：\n";
+    emit client_emit(_str);
     _online_list.clear();
 //    // 有多少个主机，就开多少个线程，用于配对
 //    std::vector<std::thread> thr_list(list.size());
