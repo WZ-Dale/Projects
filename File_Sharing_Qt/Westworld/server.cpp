@@ -1,13 +1,15 @@
 #include "server.hpp"
 
 P2PServer::P2PServer(uint16_t port, QObject *parent):_srv_port(port), QObject(parent){
-    qDebug() << "server构造函数ID:" << QThread::currentThreadId();
     // 判断共享目录是否存在，若不存在则创建
     if(!bf::exists(SHAREDFILE)){
         bf::create_directory(SHAREDFILE);
     }
 }
 bool P2PServer::Start(){
+    qDebug() << "server线程ID:" << QThread::currentThreadId();
+    emit complete();
+    qDebug() << "server线程ID:" << QThread::currentThreadId();
     _server.Get("/hostpair", GetHostPair);
     _server.Get("/list", GetFileList);
     _server.Get("/list/(.*)", GetFileData);

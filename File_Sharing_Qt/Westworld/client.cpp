@@ -1,9 +1,11 @@
 #include "client.hpp"
 
 P2PClient::P2PClient(uint16_t port, QObject *parent):_srv_port(port), QObject(parent){
-    qDebug() << "client构造函数ID:" << QThread::currentThreadId();
 }
 bool P2PClient::Start(){
+    qDebug() << "client线程ID:" << QThread::currentThreadId();
+    emit complete();
+    qDebug() << "client线程ID:" << QThread::currentThreadId();
     while(1){
         std::vector<std::string> list;
         std::string filename;
@@ -89,6 +91,17 @@ bool P2PClient::GetOnlineHost(std::vector<std::string> &list){
     _str += " 台主机，开始配对：\n";
     emit client_emit(_str);
     _online_list.clear();
+
+    QThread* thread11 = new QThread[list.size()];
+    for(int i = 0; i < list.size(); ++i){
+        connect(&thread11[i],SIGNAL(started()),this,SLOT(HostPair(list[i])));
+        connect(this,SIGNAL(complete()),&thread11[i],SLOT(quit()));
+        connect(&thread11[i],SIGNAL(finished()),this,SLOT(deleteLater()));
+        connect(&thread11[i],SIGNAL(finished()),&thread11[i],SLOT(deleteLater()));
+        this->moveToThread(&thread11[i]);
+        thread11[i].start();
+    }
+
 //    // 有多少个主机，就开多少个线程，用于配对
 //    std::vector<std::thread> thr_list(list.size());
 //    for(int i = 0; i < list.size(); ++i){
