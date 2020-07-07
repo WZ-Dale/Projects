@@ -42,13 +42,12 @@ signals:
 private slots:
     bool Start();
     void client_read(int a);
-    void HostPair(std::string &i);
 private:
     /* 这里所说的主机在局域网中是被请求的，则相当于服务器端 */
     /* 获取局域网中所有主机地址 */
     bool GetAllHost(std::vector<std::string> &list);
     /* 局域网中所有主机向服务器发起请求配对，配对成功的就是在线主机 */
-    //void HostPair(std::string &i);
+    void HostPair(std::string &i);
     /* 获取在线主机列表（多线程配对），需要调用上面的函数HostPair */
     bool GetOnlineHost(std::vector<std::string> &list);
     /* 打印在线主机列表 */

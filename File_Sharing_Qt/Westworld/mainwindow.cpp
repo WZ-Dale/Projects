@@ -15,25 +15,25 @@ MainWindow::MainWindow(QWidget *parent) :
     P2PServer* server = new P2PServer(9000);
     P2PClient* client = new P2PClient(9000);
 
-//    connect(thread0,SIGNAL(started()),server,SLOT(Start()));
-//    connect(server,SIGNAL(complete()),server,SLOT(deleteLater()));
-//    connect(server,SIGNAL(destroyed(QObject*)),thread0,SLOT(quit()));
-//    connect(thread0,SIGNAL(finished()),thread0,SLOT(deleteLater()));
-
-//    connect(thread1,SIGNAL(started()),client,SLOT(Start()));
-//    connect(client,SIGNAL(complete()),client,SLOT(deleteLater()));
-//    connect(client,SIGNAL(destroyed(QObject*)),thread1,SLOT(quit()));
-//    connect(thread1,SIGNAL(finished()),thread1,SLOT(deleteLater()));
-
     connect(thread0,SIGNAL(started()),server,SLOT(Start()));
-    connect(server,SIGNAL(complete()),thread0,SLOT(quit()));
-    connect(thread0,SIGNAL(finished()),server,SLOT(deleteLater()));
+    connect(server,SIGNAL(complete()),server,SLOT(deleteLater()));
+    connect(server,SIGNAL(destroyed(QObject*)),thread0,SLOT(quit()));
     connect(thread0,SIGNAL(finished()),thread0,SLOT(deleteLater()));
 
     connect(thread1,SIGNAL(started()),client,SLOT(Start()));
-    connect(client,SIGNAL(complete()),thread1,SLOT(quit()));
-    connect(thread1,SIGNAL(finished()),client,SLOT(deleteLater()));
+    connect(client,SIGNAL(complete()),client,SLOT(deleteLater()));
+    connect(client,SIGNAL(destroyed(QObject*)),thread1,SLOT(quit()));
     connect(thread1,SIGNAL(finished()),thread1,SLOT(deleteLater()));
+
+//    connect(thread0,SIGNAL(started()),server,SLOT(Start()));
+//    connect(server,SIGNAL(complete()),thread0,SLOT(quit()));
+//    connect(thread0,SIGNAL(finished()),server,SLOT(deleteLater()));
+//    connect(thread0,SIGNAL(finished()),thread0,SLOT(deleteLater()));
+
+//    connect(thread1,SIGNAL(started()),client,SLOT(Start()));
+//    connect(client,SIGNAL(complete()),thread1,SLOT(quit()));
+//    connect(thread1,SIGNAL(finished()),client,SLOT(deleteLater()));
+//    connect(thread1,SIGNAL(finished()),thread1,SLOT(deleteLater()));
 
     connect(server,SIGNAL(server_emit(QString)),this,SLOT(UI_read(QString)));
     connect(client,SIGNAL(client_emit(QString)),this,SLOT(UI_read(QString)));
