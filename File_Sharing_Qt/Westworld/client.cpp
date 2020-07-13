@@ -69,21 +69,21 @@ bool P2PClient::GetAllHost(std::vector<std::string> &list){
     return true;
 }
 /* 局域网中所有主机向服务器发起请求配对，配对成功的就是在线主机 */
-void P2PClient::HostPair(std::string &i){
-    Client client(i.c_str(), _srv_port); // 此处i是主机地址
-    auto rsp = client.Get("/hostpair"); // 请求配对
-    _str = "host ";
-    _str += QString::fromStdString(i);
-    if(rsp && rsp->status == 200){    // 若配对成功，则将成功的主机地址放入在线主机列表中
-        _str += " pair success\n";
-        _online_list.push_back(i);
-    }
-    else{
-        _str += " pair failed\n";
-    }
-    emit client_emit(_str);
-    return;
-}
+//void P2PClient::HostPair(std::string &i){
+//    Client client(i.c_str(), _srv_port); // 此处i是主机地址
+//    auto rsp = client.Get("/hostpair"); // 请求配对
+//    _str = "host ";
+//    _str += QString::fromStdString(i);
+//    if(rsp && rsp->status == 200){    // 若配对成功，则将成功的主机地址放入在线主机列表中
+//        _str += " pair success\n";
+//        _online_list.push_back(i);
+//    }
+//    else{
+//        _str += " pair failed\n";
+//    }
+//    emit client_emit(_str);
+//    return;
+//}
 /* 获取在线主机列表（多线程配对），需要调用上面的函数HostPair */
 bool P2PClient::GetOnlineHost(std::vector<std::string> &list){
     _str = "该主机所在的局域网中最多有 ";
@@ -92,17 +92,17 @@ bool P2PClient::GetOnlineHost(std::vector<std::string> &list){
     emit client_emit(_str);
     _online_list.clear();
 
-//    QThread* thread11 = new QThread[list.size()];
-//    for(int i = 0; i < list.size(); ++i){
-
-//        connect(&thread11[i],SIGNAL(started()),this,SLOT(HostPair(list[i])));
-//        connect(this,SIGNAL(complete()),&thread11[i],SLOT(quit()));
-//        connect(&thread11[i],SIGNAL(finished()),this,SLOT(deleteLater()));
-//        connect(&thread11[i],SIGNAL(finished()),&thread11[i],SLOT(deleteLater()));
-//        this->moveToThread(&thread11[i]);
-//        thread11[i].start();
-//    }
-
+    QThread* thread11 = new QThread[list.size()];
+    HP* hp = new HP[list.size()];
+    for(int i = 0; i < list.size(); ++i){
+        connect(&thread11[i],&QThread::started,&hp[i],[&](){HostPair(this,list[i]);});
+        //connect(&thread11[i],SIGNAL(started()),&hp[i],SLOT(HostPair()));
+        connect(&hp[i],SIGNAL(complete()),&hp[i],SLOT(deleteLater()));
+        connect(&hp[i],SIGNAL(destroyed(QObject*)),&thread11[i],SLOT(quit()));
+        connect(&thread11[i],SIGNAL(finished()),&thread11[i],SLOT(deleteLater()));
+        hp[i].moveToThread(&thread11[i]);
+        thread11[i].start();
+    }
 //    // 有多少个主机，就开多少个线程，用于配对
 //    std::vector<std::thread> thr_list(list.size());
 //    for(int i = 0; i < list.size(); ++i){
@@ -112,9 +112,9 @@ bool P2PClient::GetOnlineHost(std::vector<std::string> &list){
 //    for(int i = 0; i < thr_list.size(); ++i){
 //        thr_list[i].join();
 //    }
-    for(auto& i : list){
-        HostPair(i);
-    }
+//    for(auto& i : list){
+//        HostPair(i);
+//    }
     return true;
 }
 /* 打印在线主机列表 */
@@ -150,3 +150,20 @@ int P2PClient::DoFile(){
     return _choose;
 }
 
+HP::HP(QObject *parent):QObject(parent){
+}
+void HP::HostPair(P2PClient* cl, std::string &i){
+    Client client(i.c_str(), cl->_srv_port); // 此处i是主机地址
+    auto rsp = client.Get("/hostpair"); // 请求配对
+    cl->_str = "host ";
+    cl->_str += QString::fromStdString(i);
+    if(rsp && rsp->status == 200){    // 若配对成功，则将成功的主机地址放入在线主机列表中
+        cl->_str += " pair success\n";
+        cl->_online_list.push_back(i);
+    }
+    else{
+        cl->_str += " pair failed\n";
+    }
+    emit cl->client_emit(cl->_str);
+    return;
+}

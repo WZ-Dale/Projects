@@ -43,3 +43,5 @@ LIBS += \
     -lboost_system \
     -lpthread \
     -lboost_thread
+
+CONFIG += c++11
