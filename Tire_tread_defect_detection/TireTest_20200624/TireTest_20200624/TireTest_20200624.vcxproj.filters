@@ -21,21 +21,12 @@
     <ClCompile Include="Dispose.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Feature.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Joint.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dispose.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Feature.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Joint.h">
+    <ClInclude Include="jb.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -128,14 +128,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dispose.cpp" />
-    <ClCompile Include="Feature.cpp" />
-    <ClCompile Include="Joint.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dispose.h" />
-    <ClInclude Include="Feature.h" />
-    <ClInclude Include="Joint.h" />
+    <ClInclude Include="jb.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
